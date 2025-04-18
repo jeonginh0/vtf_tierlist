@@ -1,0 +1,29 @@
+[
+  {
+    "tier": "1티어",
+    "color": "#FF9999",
+    "agents": [
+      "이노"
+    ]
+  },
+  {
+    "tier": "2티어",
+    "color": "#FFB266",
+    "agents": []
+  },
+  {
+    "tier": "3티어",
+    "color": "#FFE5B2",
+    "agents": []
+  },
+  {
+    "tier": "4티어",
+    "color": "#FFFF99",
+    "agents": []
+  },
+  {
+    "tier": "5티어",
+    "color": "#B2FFB2",
+    "agents": []
+  }
+]
