@@ -1,20 +1,8 @@
 import { NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import connectDB from '@/lib/mongodb';
+import TierList from '@/models/TierList';
 
-const dataFilePath = path.join(process.cwd(), 'data', 'tierlist.json');
-
-// 데이터 디렉토리가 없으면 생성
-async function ensureDataDirectory() {
-  const dataDir = path.join(process.cwd(), 'data');
-  try {
-    await fs.access(dataDir);
-  } catch {
-    await fs.mkdir(dataDir);
-  }
-}
-
-// 초기 데이터
+// 초기 티어 데이터
 const initialTiers = [
   { tier: '1티어', color: '#FF9999', agents: [] },
   { tier: '2티어', color: '#FFB266', agents: [] },
@@ -25,35 +13,42 @@ const initialTiers = [
 
 export async function GET() {
   try {
-    await ensureDataDirectory();
+    await connectDB();
+    const tierList = await TierList.findOne();
     
-    try {
-      const data = await fs.readFile(dataFilePath, 'utf-8');
-      return NextResponse.json(JSON.parse(data));
-    } catch {
-      // 파일이 없으면 초기 데이터로 생성
-      await fs.writeFile(dataFilePath, JSON.stringify(initialTiers, null, 2));
-      return NextResponse.json(initialTiers);
+    if (!tierList) {
+      // 티어리스트가 없으면 초기 데이터 생성
+      const newTierList = await TierList.create({ tiers: initialTiers });
+      return NextResponse.json({ tiers: newTierList.tiers });
     }
-  } catch {
-    return NextResponse.json({ error: '데이터를 불러오는데 실패했습니다.' }, { status: 500 });
+    
+    return NextResponse.json({ tiers: tierList.tiers });
+  } catch (error) {
+    console.error('티어리스트 조회 중 오류 발생:', error);
+    return NextResponse.json(
+      { error: '티어리스트를 가져오는 중 오류가 발생했습니다.' },
+      { status: 500 }
+    );
   }
 }
 
 export async function PUT(request: Request) {
   try {
-    const data = await request.json();
+    const { tiers } = await request.json();
     
-    // 요청 데이터 검증
-    if (!Array.isArray(data)) {
-      return NextResponse.json({ error: '잘못된 데이터 형식입니다.' }, { status: 400 });
-    }
-
-    await ensureDataDirectory();
-    await fs.writeFile(dataFilePath, JSON.stringify(data, null, 2));
+    await connectDB();
+    const tierList = await TierList.findOneAndUpdate(
+      {},
+      { tiers, updatedAt: new Date() },
+      { upsert: true, new: true }
+    );
     
-    return NextResponse.json({ message: '저장 완료' });
-  } catch {
-    return NextResponse.json({ error: '데이터 저장에 실패했습니다.' }, { status: 500 });
+    return NextResponse.json({ tiers: tierList.tiers });
+  } catch (error) {
+    console.error('티어리스트 업데이트 중 오류 발생:', error);
+    return NextResponse.json(
+      { error: '티어리스트를 업데이트하는 중 오류가 발생했습니다.' },
+      { status: 500 }
+    );
   }
 } 
