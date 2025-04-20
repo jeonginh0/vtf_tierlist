@@ -1,9 +1,17 @@
 @import url('https://cdn.jsdelivr.net/gh/henockk/pretendard-font/css/pretendard.css');
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #000000;
+  --secondary-color: #ffffff;
+  --accent-color: #007AFF;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --background-color: #ffffff;
 }
 
 @theme inline {
@@ -21,9 +29,9 @@
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Pretendard', Arial, Helvetica, sans-serif;
+  font-family: 'Average', sans-serif;
+  color: var(--text-primary);
+  background-color: var(--background-color);
 }
 
 /* 기존 스타일 */
@@ -98,4 +106,131 @@ body {
   border: 1px solid #374151;
   border-radius: 0.5rem;
   overflow: hidden;
+}
+
+/* 헤더 스타일 */
+@layer components {
+  .header {
+    @apply bg-white border-b border-gray-200 fixed top-0 left-0 right-0 z-50;
+  }
+
+  .header-container {
+    @apply max-w-7xl mx-auto px-6 py-4;
+  }
+
+  .header-content {
+    @apply flex justify-between items-center;
+  }
+
+  .header-logo {
+    @apply flex items-center;
+  }
+
+  .header-nav {
+    @apply hidden md:flex space-x-12;
+  }
+
+  .header-nav-link {
+    @apply text-base font-medium hover:text-gray-600 transition-colors;
+  }
+
+  .header-actions {
+    @apply flex items-center space-x-6;
+  }
+
+  .header-button {
+    @apply p-2 hover:bg-gray-100 rounded-full transition-colors;
+  }
+
+  .login-button {
+    @apply bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors;
+  }
+
+  .main-content {
+    @apply pt-24;
+  }
+
+  .hero-section {
+    @apply text-center mb-32;
+  }
+
+  .hero-title {
+    @apply text-4xl font-['NanumMyeongjo'] mb-8 text-gray-800;
+  }
+
+  .hero-subtitle {
+    @apply text-7xl font-['NanumMyeongjo'] mb-16 text-gray-900;
+  }
+
+  .categories-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-16 mb-32;
+  }
+
+  .category-card {
+    @apply bg-white rounded-[90px] border border-gray-200 p-16 text-center hover:shadow-lg transition-all duration-300;
+  }
+
+  .category-icon {
+    @apply mb-12;
+  }
+
+  .category-title {
+    @apply text-4xl font-['Poppins'] font-semibold mb-8 text-gray-900;
+  }
+
+  .category-description {
+    @apply text-xl font-['Poppins'] text-gray-700 leading-relaxed;
+  }
+
+  .top-players {
+    @apply mb-32;
+  }
+
+  .top-players-title {
+    @apply text-4xl font-['Noto_Sans'] font-medium mb-16 text-gray-900;
+  }
+
+  .top-players-container {
+    @apply bg-gray-50 rounded-3xl p-12 border border-gray-200;
+  }
+
+  .top-players-header {
+    @apply grid grid-cols-5 gap-8 text-center text-lg font-['Poppins'] font-semibold text-gray-500 mb-8;
+  }
+
+  .top-players-list {
+    @apply space-y-8;
+  }
+
+  .player-card {
+    @apply grid grid-cols-5 gap-8 items-center bg-white rounded-2xl p-6 shadow-sm;
+  }
+
+  .player-rank {
+    @apply text-3xl font-['Poppins'] font-semibold text-gray-900;
+  }
+
+  .player-name {
+    @apply text-2xl font-['Poppins'] font-semibold text-gray-900;
+  }
+
+  .player-tier {
+    @apply text-2xl font-['Poppins'] font-semibold;
+  }
+
+  .tier-diamond {
+    @apply text-blue-600;
+  }
+
+  .tier-platinum {
+    @apply text-purple-600;
+  }
+
+  .tier-gold {
+    @apply text-yellow-600;
+  }
+
+  .player-stats {
+    @apply text-2xl font-['Poppins'] font-semibold text-gray-900;
+  }
 }

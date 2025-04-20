@@ -1,0 +1,72 @@
+.loginContainer {
+  max-width: 600px;
+  margin: 4rem auto;
+  padding: 2rem;
+}
+
+.title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #000000;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formGroup label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  color: #696F79;
+}
+
+.formGroup input {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #8692A6;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  color: #000000;
+}
+
+.formGroup input::placeholder {
+  color: #D9D9D9;
+}
+
+.errorText {
+  color: #FF0000;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 11px;
+  margin-top: 0.25rem;
+}
+
+.submitButton {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #D9D9D9;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background-color: #c4c4c4;
+} 

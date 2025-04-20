@@ -1,99 +1,143 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import TierList from '../components/TierList';
-import Auth from '../components/Auth';
-import { AuthState } from '../types/user';
+import React, { useEffect, useState } from 'react';
+import Header from '@/components/Header';
+import Image from 'next/image';
+import styles from '@/styles/Home.module.css';
+
+interface TopPlayer {
+  nickname: string;
+  tier: string;
+  kda: string;
+  winRate: string;
+  totalGames: number;
+}
 
 export default function Home() {
-  const [authState, setAuthState] = useState<AuthState>({
-    isLoggedIn: false,
-    currentUser: null,
-    currentNickname: null
-  });
-  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentUser');
-    const currentNickname = localStorage.getItem('currentNickname');
-    if (currentUser && currentNickname) {
-      setAuthState({
-        isLoggedIn: true,
-        currentUser,
-        currentNickname
-      });
-    }
+    const fetchTopPlayers = async () => {
+      try {
+        const response = await fetch('/api/users/top');
+        if (!response.ok) {
+          throw new Error('상위 플레이어 정보를 불러올 수 없습니다.');
+        }
+        const data = await response.json();
+        setTopPlayers(data.topPlayers);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopPlayers();
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('currentNickname');
-    setAuthState({
-      isLoggedIn: false,
-      currentUser: null,
-      currentNickname: null
-    });
-  };
-
   return (
-    <main className="min-h-screen bg-gray-900 p-4">
-      <div className="max-w-6xl mx-auto">
-        {/* 헤더 */}
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-white">VTF 티어리스트</h1>
-          <div>
-            {authState.isLoggedIn ? (
-              <div className="flex items-center gap-4">
-                <span className="text-white">
-                  <span className="text-gray-400">환영합니다,</span>{' '}
-                  <span className="font-medium">{authState.currentNickname}</span>
-                  <span className="text-gray-400 text-sm ml-2">({authState.currentUser})</span>
-                  <span className="ml-2 text-xs px-2 py-1 bg-blue-500 rounded-full">관리자</span>
-                </span>
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
-                >
-                  로그아웃
-                </button>
+    <>
+      <Header />
+      <main className={styles.mainContent}>
+        <div className={styles.container}>
+          {/* Hero Section */}
+          <div className={styles.heroSection}>
+            <div className={styles.heroImageContainer}>
+              <Image src="/VTFIMG.svg" alt="VTF" width={800} height={800} className={styles.heroImage} />
+              <div className={styles.heroTextContainer}>
+                <h1 className={styles.heroTitle}>
+                  Ready for your Team Fight
+                </h1>
+                <h2 className={styles.heroSubtitle}>
+                  VTF에서 체계적인 내전을 지원합니다!
+                </h2>
               </div>
+              <div className={styles.scrollIndicator}>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className={styles.scrollArrow} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Categories */}
+          <div className={styles.categoriesGrid}>
+            {/* Rank */}
+            <div className={styles.categoryCard}>
+              <div className={styles.categoryIcon}>
+                <Image src="/main-rank-img.svg" alt="Rank" width={120} height={120} className="mx-auto" />
+              </div>
+              <h3 className={styles.categoryTitle}>랭킹</h3>
+              <p className={styles.categoryDescription}>
+                내 실력은 어떨까?
+                <br />
+                VTF 에서의 
+                <br />
+                당신의 랭킹을 확인하세요!
+              </p>
+            </div>
+
+            {/* Team Build -> Tier List */}
+            <div className={styles.categoryCard}>
+              <div className={styles.categoryIcon}>
+                <Image src="/main-team-img.svg" alt="Tier List" width={120} height={120} className="mx-auto" />
+              </div>
+              <h3 className={styles.categoryTitle}>티어리스트</h3>
+              <p className={styles.categoryDescription}>
+                VTF의
+                <br />
+                티어리스트를 확인하세요!
+              </p>
+            </div>
+          </div>
+
+          {/* Top Players */}
+          <div className={styles.topPlayers}>
+            <h2 className={styles.sectionTitle}>Top Player</h2>
+            {error && <p className={styles.error}>{error}</p>}
+            {loading ? (
+              <p className={styles.loading}>로딩 중...</p>
             ) : (
-              <button
-                onClick={() => setShowLoginModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-              >
-                관리자 로그인
-              </button>
+              <table className={styles.playerTable}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>KDA</th>
+                    <th>Tier</th>
+                    <th>Win / Lose</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topPlayers.slice(0, 3).map((player, index) => (
+                    <tr key={index} className={styles.playerRow}>
+                      <td className={styles.playerRank}>{index + 1}</td>
+                      <td>{player.nickname}</td>
+                      <td className={styles.kda}>{player.kda}</td>
+                      <td className={styles.tier}>{player.tier}</td>
+                      <td className={styles.winRate}>{player.winRate}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             )}
           </div>
         </div>
-
-        {/* 티어리스트 */}
-        <TierList currentUser={authState.currentUser} />
-      </div>
-
-      {/* 로그인 모달 */}
-      {showLoginModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="relative w-full max-w-md">
-            <button
-              onClick={() => setShowLoginModal(false)}
-              className="absolute top-2 right-2 text-gray-400 hover:text-white"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-            <Auth 
-              onAuthChange={(state) => {
-                setAuthState(state);
-                setShowLoginModal(false);
-              }} 
-            />
-          </div>
-        </div>
-      )}
-    </main>
+      </main>
+    </>
   );
 }
 

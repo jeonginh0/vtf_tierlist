@@ -1,55 +1,30 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import { MongoClient } from 'mongodb';
 
-// 환경 변수 로드
-dotenv.config();
-
-const MONGODB_URI = process.env.MONGODB_URI;
-
-if (!MONGODB_URI) {
-  throw new Error('MONGODB_URI 환경 변수가 설정되지 않았습니다.');
+if (!process.env.MONGODB_URI) {
+  throw new Error('MONGODB_URI가 환경변수에 설정되어 있지 않습니다.');
 }
 
-interface MongooseCache {
-  conn: typeof mongoose | null;
-  promise: Promise<typeof mongoose> | null;
-}
+const uri = process.env.MONGODB_URI;
+const options = {};
 
-interface CustomGlobal extends Global {
-  mongoose: MongooseCache;
-}
+let client;
+let clientPromise: Promise<MongoClient>;
 
-declare const global: CustomGlobal;
+if (process.env.NODE_ENV === 'development') {
+  // 개발 환경에서는 전역 변수를 사용하여 연결을 재사용
+  const globalWithMongo = global as typeof globalThis & {
+    _mongoClientPromise?: Promise<MongoClient>;
+  };
 
-const cached = global.mongoose || { conn: null, promise: null };
-
-if (!global.mongoose) {
-  global.mongoose = cached;
-}
-
-async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
+  if (!globalWithMongo._mongoClientPromise) {
+    client = new MongoClient(uri, options);
+    globalWithMongo._mongoClientPromise = client.connect();
   }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
+  clientPromise = globalWithMongo._mongoClientPromise;
+} else {
+  // 프로덕션 환경에서는 새로운 연결 생성
+  client = new MongoClient(uri, options);
+  clientPromise = client.connect();
 }
 
-export default connectDB; 
+export default clientPromise; 
