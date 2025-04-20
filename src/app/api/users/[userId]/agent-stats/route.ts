@@ -70,32 +70,27 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    const existingStats = user.agentStats?.find((stat: AgentStats) => stat.agentName === agentName);
-    const updatedStats: AgentStats = {
+    const newStats: AgentStats = {
       agentName,
-      playCount: (existingStats?.playCount || 0) + 1,
-      kills: (existingStats?.kills || 0) + kills,
-      deaths: (existingStats?.deaths || 0) + deaths,
-      assists: (existingStats?.assists || 0) + assists,
-      wins: (existingStats?.wins || 0) + (isWin ? 1 : 0),
-      losses: (existingStats?.losses || 0) + (isWin ? 0 : 1),
+      playCount: 1,
+      kills,
+      deaths,
+      assists,
+      wins: isWin ? 1 : 0,
+      losses: isWin ? 0 : 1,
     };
 
     const result = await usersCollection.updateOne(
       { _id: new ObjectId(userId) },
       {
         $set: {
-          agentStats: existingStats
-            ? user.agentStats.map((stat: AgentStats) =>
-                stat.agentName === agentName ? updatedStats : stat
-              )
-            : [updatedStats],
+          agentStats: [...(user.agentStats || []), newStats]
         },
       }
     );
 
     if (result.modifiedCount === 0) {
-      return NextResponse.json({ error: '통계 업데이트에 실패했습니다.' }, { status: 500 });
+      return NextResponse.json({ error: '통계 추가에 실패했습니다.' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
