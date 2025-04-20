@@ -216,35 +216,39 @@ export default function AdminPage() {
       setError('모든 필드를 입력해주세요.');
       return;
     }
-
-    if (agentStats.isWin === undefined) {
+  
+    if (!agentStats.isWin && !agentStats.isLoss) {
       setError('승/패를 선택해주세요.');
       return;
     }
-
-    const requestData = {
+  
+    const userData = users.find((u) => u._id === selectedUser);
+    const existingAgent = userData?.agentStats.find((a) => a.agentName === agentStats.agentName);
+  
+    const updatedStats = {
       agentName: agentStats.agentName,
-      kills: agentStats.kills,
-      deaths: agentStats.deaths,
-      assists: agentStats.assists,
-      isWin: agentStats.isWin,
+      kills: (existingAgent?.kills || 0) + agentStats.kills,
+      deaths: (existingAgent?.deaths || 0) + agentStats.deaths,
+      assists: (existingAgent?.assists || 0) + agentStats.assists,
+      wins: (existingAgent?.wins || 0) + (agentStats.isWin ? 1 : 0),
+      losses: (existingAgent?.losses || 0) + (agentStats.isLoss ? 1 : 0),
+      playCount: (existingAgent?.playCount || 0) + 1,
     };
-    console.log('전송할 데이터:', requestData);
-
+  
     try {
       const response = await fetch(`/api/users/${selectedUser}/agent-stats`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(requestData),
+        body: JSON.stringify(updatedStats),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || '요원 통계 업데이트에 실패했습니다.');
       }
-
+  
       await fetchUsers();
       setError(null);
       setAgentStats({
@@ -259,6 +263,7 @@ export default function AdminPage() {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
     }
   };
+  
 
   if (loading) {
     return (
