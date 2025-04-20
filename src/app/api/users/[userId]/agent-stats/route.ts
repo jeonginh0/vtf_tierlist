@@ -70,11 +70,11 @@ export async function PUT(request: NextRequest, context: { params: { userId: str
 
 // GET: agent_stats 컬렉션에서 통계 조회
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-): Promise<NextResponse> {
+  request: Request,
+  context: { params: { userId: string } }
+): Promise<Response> {
   try {
-    const { userId } = params;
+    const { userId } = context.params;
     if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const client = await clientPromise;
