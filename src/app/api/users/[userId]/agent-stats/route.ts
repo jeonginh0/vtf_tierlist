@@ -72,7 +72,7 @@ export async function PUT(request: NextRequest, context: { params: { userId: str
 export async function GET(
   request: NextRequest,
   { params }: { params: { userId: string } }
-) {
+): Promise<NextResponse> {
   try {
     const { userId } = params;
     if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
