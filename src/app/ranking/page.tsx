@@ -47,7 +47,9 @@ const RankingPage: React.FC = () => {
               nickname: user.nickname,
               mostUsedAgent: user.mostUsedAgent,
               tier: user.tier,
-              preferredPosition: user.preferredPosition
+              preferredPosition: user.preferredPosition,
+              kda: user.kda,
+              winRate: user.winRate
             });
             return {
               ...user,
@@ -56,6 +58,8 @@ const RankingPage: React.FC = () => {
           });
           console.log('처리된 사용자 데이터:', usersWithMainAgent);
           setUsers(usersWithMainAgent);
+        } else {
+          console.error('API 응답에 rankings 데이터가 없습니다:', data);
         }
       } catch (error) {
         console.error('사용자 목록 로딩 오류:', error);

@@ -80,10 +80,14 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'overall';
     
+    console.log('랭킹 API 호출 - 타입:', type);
+    
     const client = await clientPromise;
     const db = client.db('vtf');
     
     const users = await db.collection('users').find({}).toArray() as User[];
+    console.log('DB에서 가져온 사용자 수:', users.length);
+    
     const tiersCollection = db.collection('tiers');
     
     if (type === 'agent') {
@@ -125,6 +129,7 @@ export async function GET(request: Request) {
         });
       });
       
+      console.log('요원별 랭킹 데이터:', agentRankings);
       return NextResponse.json({ rankings: agentRankings });
       
     } else if (type === 'position') {
@@ -184,6 +189,7 @@ export async function GET(request: Request) {
         }
       });
       
+      console.log('포지션별 랭킹 데이터:', positionRankings);
       return NextResponse.json({ rankings: positionRankings });
       
     } else if (type === 'tier') {
@@ -246,6 +252,7 @@ export async function GET(request: Request) {
         }
       });
       
+      console.log('티어별 랭킹 데이터:', tierRankings);
       return NextResponse.json({ rankings: tierRankings });
       
     } else {
@@ -289,6 +296,7 @@ export async function GET(request: Request) {
         return parseFloat(b.kda) - parseFloat(a.kda);
       });
 
+      console.log('전체 랭킹 데이터:', rankings);
       return NextResponse.json({ rankings });
     }
   } catch (error) {
