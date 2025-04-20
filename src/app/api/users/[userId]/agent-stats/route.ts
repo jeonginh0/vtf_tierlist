@@ -14,12 +14,12 @@ interface AgentStats {
 
 // PUT: 요원 통계 업데이트
 export async function PUT(
-  request: Request,
-  { params }: { params: { userId: string } }
+  request: NextRequest,
+  context: { params: { userId: string } }
 ) {
   try {
     const { agentName, kills, deaths, assists, isWin } = await request.json();
-    const { userId } = params;
+    const userId = context.params.userId;
 
     if (!agentName || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined) {
       return NextResponse.json(
@@ -84,12 +84,12 @@ export async function PUT(
 // GET: 요원 통계 조회
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  context: { params: { userId: string } }
 ) {
   try {
     const client = await clientPromise;
     const db = client.db('vtf');
-    const userId = params.userId;
+    const userId = context.params.userId;
 
     // 사용자 정보 조회
     const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
@@ -117,12 +117,12 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  context: { params: { userId: string } }
 ) {
   try {
     const client = await clientPromise;
     const db = client.db('vtf');
-    const userId = params.userId;
+    const userId = context.params.userId;
     const { agent, kills, deaths, assists, isWin } = await request.json();
 
     // 필수 필드 검증

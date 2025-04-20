@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
@@ -14,12 +14,12 @@ interface AgentStats {
 }
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { userId: string } }
+  request: NextRequest,
+  context: { params: { userId: string } }
 ) {
   try {
     const { agentName, kills, deaths, assists, isWin, matchDate } = await request.json();
-    const { userId } = params;
+    const userId = context.params.userId;
 
     if (!agentName || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined || !matchDate) {
       return NextResponse.json(
