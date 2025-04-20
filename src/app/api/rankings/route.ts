@@ -132,17 +132,16 @@ export async function GET(request: Request) {
       const positionRankings: PositionRanking[] = [];
       const positionMap = new Map<string, PositionRanking['users']>();
       
+      // 포지션 순서 정의
+      const positionOrder = ['타격대', '감시자', '전략가', '척후대'];
+      
       users.forEach(user => {
         const position = user.preferredPosition || '미지정';
         if (!positionMap.has(position)) {
           positionMap.set(position, []);
         }
         
-        const mostUsedAgent = user.agentStats?.length > 0 
-          ? user.agentStats.reduce((prev, current) => 
-              prev.playCount > current.playCount ? prev : current
-            ).agentName
-          : '미지정';
+        const mostUsedAgent = getMostUsedAgent(user.agentStats || []);
           
         const totalKills = user.agentStats?.reduce((sum, stat) => sum + stat.kills, 0) || 0;
         const totalDeaths = user.agentStats?.reduce((sum, stat) => sum + stat.deaths, 0) || 0;
@@ -166,15 +165,23 @@ export async function GET(request: Request) {
         });
       });
       
-      positionMap.forEach((users, position) => {
-        positionRankings.push({
-          position,
-          users: users.sort((a, b) => {
-            if (a.kda === 'Perfect') return -1;
-            if (b.kda === 'Perfect') return 1;
-            return parseFloat(b.kda) - parseFloat(a.kda);
-          })
-        });
+      // 포지션 순서대로 정렬
+      positionOrder.forEach(position => {
+        if (positionMap.has(position)) {
+          positionRankings.push({
+            position,
+            users: positionMap.get(position)!.sort((a, b) => {
+              // 주요 요원이 '미지정'이고 K/D가 'Perfect'인 경우 맨 아래로
+              if (a.mostUsedAgent === '미지정' && a.kda === 'Perfect') return 1;
+              if (b.mostUsedAgent === '미지정' && b.kda === 'Perfect') return -1;
+              
+              // 나머지 경우는 기존 정렬 로직 유지
+              if (a.kda === 'Perfect' && b.kda !== 'Perfect') return -1;
+              if (b.kda === 'Perfect' && a.kda !== 'Perfect') return 1;
+              return parseFloat(b.kda) - parseFloat(a.kda);
+            })
+          });
+        }
       });
       
       return NextResponse.json({ rankings: positionRankings });
@@ -183,6 +190,9 @@ export async function GET(request: Request) {
       // 티어별 랭킹
       const tierRankings: TierRanking[] = [];
       const tierMap = new Map<string, TierRanking['users']>();
+      
+      // 티어 순서 정의
+      const tierOrder = ['1티어', '2티어', '3티어', '4티어', '5티어'];
       
       for (const user of users) {
         // 유저의 티어 찾기
@@ -193,11 +203,7 @@ export async function GET(request: Request) {
           tierMap.set(tier, []);
         }
         
-        const mostUsedAgent = user.agentStats?.length > 0 
-          ? user.agentStats.reduce((prev, current) => 
-              prev.playCount > current.playCount ? prev : current
-            ).agentName
-          : '미지정';
+        const mostUsedAgent = getMostUsedAgent(user.agentStats || []);
           
         const totalKills = user.agentStats?.reduce((sum, stat) => sum + stat.kills, 0) || 0;
         const totalDeaths = user.agentStats?.reduce((sum, stat) => sum + stat.deaths, 0) || 0;
@@ -221,15 +227,23 @@ export async function GET(request: Request) {
         });
       }
       
-      tierMap.forEach((users, tier) => {
-        tierRankings.push({
-          tier,
-          users: users.sort((a, b) => {
-            if (a.kda === 'Perfect') return -1;
-            if (b.kda === 'Perfect') return 1;
-            return parseFloat(b.kda) - parseFloat(a.kda);
-          })
-        });
+      // 티어 순서대로 정렬
+      tierOrder.forEach(tier => {
+        if (tierMap.has(tier)) {
+          tierRankings.push({
+            tier,
+            users: tierMap.get(tier)!.sort((a, b) => {
+              // 주요 요원이 '미지정'이고 K/D가 'Perfect'인 경우 맨 아래로
+              if (a.mostUsedAgent === '미지정' && a.kda === 'Perfect') return 1;
+              if (b.mostUsedAgent === '미지정' && b.kda === 'Perfect') return -1;
+              
+              // 나머지 경우는 기존 정렬 로직 유지
+              if (a.kda === 'Perfect' && b.kda !== 'Perfect') return -1;
+              if (b.kda === 'Perfect' && a.kda !== 'Perfect') return 1;
+              return parseFloat(b.kda) - parseFloat(a.kda);
+            })
+          });
+        }
       });
       
       return NextResponse.json({ rankings: tierRankings });
@@ -265,8 +279,13 @@ export async function GET(request: Request) {
       }));
 
       rankings.sort((a, b) => {
-        if (a.kda === 'Perfect') return -1;
-        if (b.kda === 'Perfect') return 1;
+        // 주요 요원이 '미지정'이고 K/D가 'Perfect'인 경우 맨 아래로
+        if (a.mostUsedAgent === '미지정' && a.kda === 'Perfect') return 1;
+        if (b.mostUsedAgent === '미지정' && b.kda === 'Perfect') return -1;
+        
+        // 나머지 경우는 기존 정렬 로직 유지
+        if (a.kda === 'Perfect' && b.kda !== 'Perfect') return -1;
+        if (b.kda === 'Perfect' && a.kda !== 'Perfect') return 1;
         return parseFloat(b.kda) - parseFloat(a.kda);
       });
 

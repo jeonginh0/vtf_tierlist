@@ -70,9 +70,10 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: '사용자를 찾을 수 없습니다.' }, { status: 404 });
     }
 
+    const existingStats = user.agentStats?.find((stat: AgentStats) => stat.agentName === agentName);
     const newStats: AgentStats = {
       agentName,
-      playCount: 1,
+      playCount: (existingStats?.playCount || 0) + 1,
       kills,
       deaths,
       assists,
@@ -84,7 +85,11 @@ export async function PUT(request: NextRequest) {
       { _id: new ObjectId(userId) },
       {
         $set: {
-          agentStats: [...(user.agentStats || []), newStats]
+          agentStats: existingStats
+            ? user.agentStats.map((stat: AgentStats) =>
+                stat.agentName === agentName ? newStats : stat
+              )
+            : [...(user.agentStats || []), newStats]
         },
       }
     );
