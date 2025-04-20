@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '@/components/Header';
 import TierList from '@/components/TierList';
 import styles from '@/styles/TierList.module.css';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface Agent {
   userId: string;
@@ -19,6 +20,7 @@ interface Tier {
 export default function TierListPage() {
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const fetchTierList = async () => {
@@ -44,7 +46,10 @@ export default function TierListPage() {
 
   return (
     <>
-      <Header />
+      <Header 
+        currentUser={user}
+        onLogout={logout}
+      />
       <main className={styles.mainContent}>
         <div className={styles.container}>
           <TierList tiers={tiers} />

@@ -1,37 +1,42 @@
 import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import jwt from 'jsonwebtoken';
 
-interface UserProfile {
-  _id: ObjectId;
+interface JwtPayload {
+  userId: string;
+  email: string;
+  role: string;
   nickname: string;
-  valorantNickname: string;
-  preferredPosition: string;
-  agentStats: {
-    agentName: string;
-    playCount: number;
-    kills: number;
-    deaths: number;
-    assists: number;
-    wins: number;
-    losses: number;
-    matches: {
-      kills: number;
-      deaths: number;
-      assists: number;
-      isWin: boolean;
-      matchDate: string;
-    }[];
-  }[];
 }
 
 export async function GET(request: Request) {
   try {
-    const userId = request.headers.get('x-user-id');
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: '인증되지 않은 요청입니다.' },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+      return NextResponse.json(
+        { error: '토큰이 없습니다.' },
+        { status: 401 }
+      );
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || '') as JwtPayload;
+    const userId = decoded.userId;
+    
+    console.log('사용자 ID:', userId);
+
     if (!userId) {
       return NextResponse.json(
-        { error: '로그인이 필요합니다.' },
-        { status: 401 }
+        { error: '사용자 ID가 없습니다.' },
+        { status: 400 }
       );
     }
 
@@ -49,7 +54,7 @@ export async function GET(request: Request) {
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json(user);
   } catch (error) {
     console.error('사용자 정보 조회 중 오류 발생:', error);

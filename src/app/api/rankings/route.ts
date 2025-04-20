@@ -61,22 +61,18 @@ interface TierRanking {
 }
 
 const getMostUsedAgent = (agentStats: AgentStats[]) => {
-  let mostUsedAgent = { agentName: '미지정', playCount: 0, kd: 0 };
+  if (!agentStats || agentStats.length === 0) return '미지정';
 
-  agentStats?.forEach(stat => {
-    const agentKD = stat.deaths === 0 ? stat.kills : stat.kills / stat.deaths;
-
-    if (stat.playCount > mostUsedAgent.playCount || 
-        (stat.playCount === mostUsedAgent.playCount && agentKD > mostUsedAgent.kd)) {
-      mostUsedAgent = {
-        agentName: stat.agentName,
-        playCount: stat.playCount,
-        kd: agentKD
-      };
+  const sortedAgents = [...agentStats].sort((a, b) => {
+    if (b.playCount !== a.playCount) {
+      return b.playCount - a.playCount;
     }
+    const aKD = a.deaths === 0 ? a.kills : a.kills / a.deaths;
+    const bKD = b.deaths === 0 ? b.kills : b.kills / b.deaths;
+    return bKD - aKD;
   });
 
-  return mostUsedAgent.agentName;
+  return sortedAgents[0].agentName;
 };
 
 export async function GET(request: Request) {

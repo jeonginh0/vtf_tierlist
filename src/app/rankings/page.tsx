@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import styles from '@/styles/Rankings.module.css';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface RankingUser {
   _id: string;
@@ -68,7 +68,7 @@ export default function Rankings() {
   const [selectedAgent, setSelectedAgent] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<string>('');
   const [selectedTier, setSelectedTier] = useState<string>('');
-  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const agents = ['제트', '바이퍼', '소바', '브림스톤', '사이퍼', '레이즈', '킬조이', '스카이', '브리치', '오멘', '페이드', '하버'];
   const positions = ['타격대', '감시자', '전략가', '척후대'];
@@ -294,11 +294,8 @@ export default function Rankings() {
   return (
     <>
       <Header 
-        currentUser={null} 
-        onLogout={() => {
-          localStorage.clear();
-          router.push('/');
-        }} 
+        currentUser={user}
+        onLogout={logout}
       />
       <main className={styles.mainContent}>
         <div className={styles.container}>

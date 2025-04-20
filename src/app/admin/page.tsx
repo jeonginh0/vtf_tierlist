@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import styles from '@/styles/Admin.module.css';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AgentStats {
   agentName: string;
@@ -53,6 +54,7 @@ export default function AdminPage() {
     isLoss: false,
     matchDate: new Date().toISOString().split('T')[0]
   });
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -255,7 +257,10 @@ export default function AdminPage() {
   if (loading) {
     return (
       <>
-        <Header />
+        <Header 
+          currentUser={user}
+          onLogout={logout}
+        />
         <div className={styles.loading}>로딩 중...</div>
       </>
     );
@@ -263,7 +268,10 @@ export default function AdminPage() {
 
   return (
     <>
-      <Header />
+      <Header 
+        currentUser={user}
+        onLogout={logout}
+      />
       <main className={styles.mainContent}>
         <div className={styles.container}>
           <h1 className={styles.title}>관리자 페이지</h1>

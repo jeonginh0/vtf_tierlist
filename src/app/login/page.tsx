@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '@/styles/Login.module.css';
 import Header from '@/components/Header';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({
@@ -16,6 +17,7 @@ export default function LoginPage() {
     general: '',
   });
   const router = useRouter();
+  const { login } = useAuth();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,15 +70,8 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (response.ok) {
-        // JWT 토큰 저장
-        localStorage.setItem('token', data.token);
-        // 사용자 정보 저장
-        localStorage.setItem('currentUser', data.nickname);
-        localStorage.setItem('userEmail', data.email);
-        localStorage.setItem('valorantNickname', data.valorantNickname);
-        localStorage.setItem('role', data.role);
-        localStorage.setItem('userId', data._id);
-        
+        // 로그인 성공 시 사용자 정보와 토큰 저장
+        login(data.user, data.token);
         router.push('/');
       } else {
         if (response.status === 401) {
@@ -101,12 +96,12 @@ export default function LoginPage() {
 
   return (
     <>
-      <Header />
+      <Header currentUser={null} onLogout={() => {}} />
       <div className={styles.loginContainer}>
         <h1 className={styles.title}>로그인</h1>
+        {errors.general && <p className={styles.errorText}>{errors.general}</p>}
+        
         <form onSubmit={handleSubmit} className={styles.form}>
-          {errors.general && <p className={styles.errorText}>{errors.general}</p>}
-          
           <div className={styles.formGroup}>
             <label htmlFor="email">이메일 주소*</label>
             <input
