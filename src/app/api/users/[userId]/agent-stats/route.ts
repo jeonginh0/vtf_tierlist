@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
@@ -83,33 +83,90 @@ export async function PUT(
 
 // GET: 요원 통계 조회
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { userId: string } }
 ) {
   try {
-    const { userId } = params;
-    
     const client = await clientPromise;
     const db = client.db('vtf');
-    const usersCollection = db.collection('users');
-    
-    const user = await usersCollection.findOne(
-      { _id: new ObjectId(userId) },
-      { projection: { agentStats: 1 } }
-    );
-    
+    const userId = params.userId;
+
+    // 사용자 정보 조회
+    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
     if (!user) {
       return NextResponse.json(
-        { error: '사용자를 찾을 수 없습니다.' },
+        { error: 'User not found' },
         { status: 404 }
       );
     }
-    
-    return NextResponse.json({ agentStats: user.agentStats || [] });
+
+    // 에이전트별 통계 조회
+    const agentStats = await db.collection('agent_stats')
+      .find({ userId: new ObjectId(userId) })
+      .toArray();
+
+    return NextResponse.json(agentStats);
   } catch (error) {
-    console.error('요원 통계 조회 중 오류 발생:', error);
+    console.error('Error fetching agent stats:', error);
     return NextResponse.json(
-      { error: '서버 오류가 발생했습니다.' },
+      { error: 'Failed to fetch agent stats' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { userId: string } }
+) {
+  try {
+    const client = await clientPromise;
+    const db = client.db('vtf');
+    const userId = params.userId;
+    const { agent, kills, deaths, assists, isWin } = await request.json();
+
+    // 필수 필드 검증
+    if (!agent || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // 사용자 존재 여부 확인
+    const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    // 에이전트 통계 업데이트 또는 생성
+    await db.collection('agent_stats').updateOne(
+      { userId: new ObjectId(userId), agent },
+      {
+        $inc: {
+          kills,
+          deaths,
+          assists,
+          wins: isWin ? 1 : 0,
+          losses: isWin ? 0 : 1,
+          matches: 1
+        },
+        $setOnInsert: {
+          userId: new ObjectId(userId),
+          agent
+        }
+      },
+      { upsert: true }
+    );
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error updating agent stats:', error);
+    return NextResponse.json(
+      { error: 'Failed to update agent stats' },
       { status: 500 }
     );
   }
