@@ -12,22 +12,21 @@ interface AgentStats {
   losses: number;
 }
 
-// 유저 ID 추출 함수
-function getUserIdFromUrl(req: NextRequest): string | null {
-  const pathname = req.nextUrl.pathname;
-  const match = pathname.match(/\/users\/([^/]+)\/agent-stats/);
-  return match ? match[1] : null;
-}
+// URL에서 userId 추출 함수
+const extractUserId = (request: NextRequest): string | null => {
+  const segments = request.nextUrl.pathname.split('/');
+  const userId = segments[segments.indexOf('users') + 1];
+  return userId || null;
+};
 
-// PUT: 요원 통계 업데이트
+// PUT: 기존 users 컬렉션 내 embedded stats 업데이트
 export async function PUT(request: NextRequest) {
   try {
-    const userId = getUserIdFromUrl(request);
-    if (!userId) {
-      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
-    }
+    const userId = extractUserId(request);
+    if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const { agentName, kills, deaths, assists, isWin } = await request.json();
+
     if (!agentName || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined) {
       return NextResponse.json({ error: '필수 필드가 누락되었습니다.' }, { status: 400 });
     }
@@ -76,13 +75,11 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// GET: 요원 통계 조회
+// GET: agent_stats 컬렉션에서 통계 조회
 export async function GET(request: NextRequest) {
   try {
-    const userId = getUserIdFromUrl(request);
-    if (!userId) {
-      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
-    }
+    const userId = extractUserId(request);
+    if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const client = await clientPromise;
     const db = client.db('vtf');
@@ -104,15 +101,14 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: agent_stats 콜렉션에 통계 저장
+// POST: agent_stats 컬렉션에 통계 누적 저장
 export async function POST(request: NextRequest) {
   try {
-    const userId = getUserIdFromUrl(request);
-    if (!userId) {
-      return NextResponse.json({ error: 'Invalid URL' }, { status: 400 });
-    }
+    const userId = extractUserId(request);
+    if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const { agent, kills, deaths, assists, isWin } = await request.json();
+
     if (!agent || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
