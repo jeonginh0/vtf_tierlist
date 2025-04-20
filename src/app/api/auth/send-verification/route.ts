@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { saveVerificationCode } from '@/lib/verification';
 
 // 이메일 인증 코드를 저장할 임시 저장소
 const verificationCodes = new Map<string, { code: string; timestamp: number }>();
@@ -19,10 +20,7 @@ export async function POST(request: Request) {
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
     
     // 코드를 임시 저장소에 저장 (5분 동안 유효)
-    verificationCodes.set(email, {
-      code: verificationCode,
-      timestamp: Date.now() + 5 * 60 * 1000
-    });
+    saveVerificationCode(email, verificationCode);
 
     // 이메일 전송 설정
     const transporter = nodemailer.createTransport({
