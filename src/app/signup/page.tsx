@@ -118,7 +118,7 @@ export default function SignUp() {
 
   return (
     <>
-      <Header />
+      <Header currentUser={null} onLogout={() => {}} />
       <div className={styles.signupContainer}>
         <h1 className={styles.title}>회원가입</h1>
         <form onSubmit={handleSubmit} className={styles.form}>

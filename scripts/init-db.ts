@@ -17,7 +17,7 @@ const initialTiers = [
 
 async function initDB() {
   try {
-    await connectDB();
+    await connectDB;
 
     // 관리자 계정 생성
     const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD!, 10);

@@ -13,13 +13,11 @@ interface AgentStats {
   matches: { kills: number; deaths: number; assists: number; isWin: boolean; matchDate: string }[];
 }
 
-export async function PUT(
-  request: NextRequest,
-  context: { params: { userId: string } }
-) {
+export async function PUT(request: NextRequest) {
   try {
+    const url = new URL(request.url);
+    const userId = url.pathname.split('/')[4];
     const { agentName, kills, deaths, assists, isWin, matchDate } = await request.json();
-    const userId = context.params.userId;
 
     if (!agentName || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined || !matchDate) {
       return NextResponse.json(

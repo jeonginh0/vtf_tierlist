@@ -13,9 +13,10 @@ interface AgentStats {
 }
 
 // PUT: 기존 users 컬렉션 내 embedded stats 업데이트
-export async function PUT(request: NextRequest, context: { params: { userId: string } }) {
+export async function PUT(request: NextRequest) {
   try {
-    const { userId } = context.params;
+    const url = new URL(request.url);
+    const userId = url.pathname.split('/')[4];
     if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const { agentName, kills, deaths, assists, isWin } = await request.json();
@@ -70,11 +71,11 @@ export async function PUT(request: NextRequest, context: { params: { userId: str
 
 // GET: agent_stats 컬렉션에서 통계 조회
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { userId: string } }
-): Promise<NextResponse> {
+  request: Request
+) {
   try {
-    const { userId } = params;
+    const url = new URL(request.url);
+    const userId = url.pathname.split('/')[4];
     if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const client = await clientPromise;
@@ -98,9 +99,10 @@ export async function GET(
 }
 
 // POST: agent_stats 컬렉션에 통계 누적 저장
-export async function POST(request: NextRequest, context: { params: { userId: string } }) {
+export async function POST(request: NextRequest) {
   try {
-    const { userId } = context.params;
+    const url = new URL(request.url);
+    const userId = url.pathname.split('/')[4];
     if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
     const { agent, kills, deaths, assists, isWin } = await request.json();
