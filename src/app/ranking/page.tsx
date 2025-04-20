@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import styles from '@/styles/ranking.module.css';
+import styles from '@/styles/Rankings.module.css';
 
 interface User {
   _id: string;
