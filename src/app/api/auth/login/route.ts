@@ -15,32 +15,12 @@ export async function POST(request: Request) {
     }
 
     // MongoDB 연결
-    let client;
-    try {
-      client = await clientPromise;
-      console.log('MongoDB 연결 성공');
-    } catch (error) {
-      console.error('MongoDB 연결 실패:', error);
-      return NextResponse.json(
-        { error: '데이터베이스 연결에 실패했습니다.' },
-        { status: 500 }
-      );
-    }
-
+    const client = await clientPromise;
     const db = client.db('vtf');
 
     // 사용자 조회
-    let user;
-    try {
-      user = await db.collection('users').findOne({ email });
-      console.log('사용자 조회 결과:', user ? '사용자 발견' : '사용자 없음');
-    } catch (error) {
-      console.error('사용자 조회 중 오류:', error);
-      return NextResponse.json(
-        { error: '사용자 조회 중 오류가 발생했습니다.' },
-        { status: 500 }
-      );
-    }
+    const user = await db.collection('users').findOne({ email });
+    console.log('사용자 조회 결과:', user ? '사용자 발견' : '사용자 없음');
 
     if (!user) {
       return NextResponse.json(
@@ -49,10 +29,18 @@ export async function POST(request: Request) {
       );
     }
 
+    const [salt, storedHash] = user.password.split('.');
+    const hashedPassword = await new Promise<string>((resolve) => {
+      crypto.pbkdf2(password, salt, 1000, 64, 'sha512', (err, derivedKey) => {
+        if (err) throw err;
+        resolve(derivedKey.toString('hex'));
+      });
+    });
+
     // 비밀번호 확인
     let isPasswordValid;
     try {
-      isPasswordValid = await bcrypt.compare(password, user.password);
+      isPasswordValid = await bcrypt.compare(hashedPassword, storedHash);
       console.log('비밀번호 확인 결과:', isPasswordValid ? '일치' : '불일치');
     } catch (error) {
       console.error('비밀번호 확인 중 오류:', error);

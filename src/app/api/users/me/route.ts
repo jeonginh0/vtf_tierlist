@@ -2,23 +2,27 @@ import { NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
-interface User {
+interface UserProfile {
   _id: ObjectId;
-  email: string;
   nickname: string;
   valorantNickname: string;
   preferredPosition: string;
-  role: string;
   agentStats: {
     agentName: string;
     playCount: number;
     kills: number;
     deaths: number;
+    assists: number;
     wins: number;
     losses: number;
+    matches: {
+      kills: number;
+      deaths: number;
+      assists: number;
+      isWin: boolean;
+      matchDate: string;
+    }[];
   }[];
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 export async function GET(request: Request) {

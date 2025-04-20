@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import Image from 'next/image';
 import styles from '@/styles/Home.module.css';
+import { useRouter } from 'next/navigation';
 
 interface TopPlayer {
   nickname: string;
@@ -17,6 +18,7 @@ export default function Home() {
   const [topPlayers, setTopPlayers] = useState<TopPlayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchTopPlayers = async () => {
@@ -39,7 +41,13 @@ export default function Home() {
 
   return (
     <>
-      <Header />
+      <Header 
+        currentUser={null} 
+        onLogout={() => {
+          localStorage.clear();
+          router.push('/');
+        }} 
+      />
       <main className={styles.mainContent}>
         <div className={styles.container}>
           {/* Hero Section */}

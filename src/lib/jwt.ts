@@ -1,20 +1,20 @@
 import jwt from 'jsonwebtoken';
 
-if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET이 환경변수에 설정되어 있지 않습니다.');
+interface JwtPayload {
+  userId: string;
+  email: string;
+  role: string;
+  nickname: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET;
-const JWT_EXPIRES_IN = '7d'; // 7일
-
-export const generateToken = (payload: any) => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+export const signToken = (payload: JwtPayload): string => {
+  return jwt.sign(payload, process.env.JWT_SECRET || 'default-secret', { expiresIn: '1d' });
 };
 
-export const verifyToken = (token: string) => {
+export const verifyToken = (token: string): JwtPayload | null => {
   try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch (error) {
+    return jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as JwtPayload;
+  } catch {
     return null;
   }
 }; 
