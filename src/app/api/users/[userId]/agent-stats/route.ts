@@ -16,13 +16,49 @@ interface AgentStats {
 export async function PUT(request: NextRequest) {
   try {
     const url = new URL(request.url);
-    const userId = url.pathname.split('/')[4];
+    // URL 패턴: /api/users/[userId]/agent-stats
+    const userId = url.pathname.split('/')[3];
+    console.log('userId:', userId);
+    
     if (!userId) return NextResponse.json({ error: 'Missing userId in URL' }, { status: 400 });
 
-    const { agentName, kills, deaths, assists, isWin } = await request.json();
+    // ObjectId 형식 검증
+    if (!ObjectId.isValid(userId)) {
+      console.log('유효하지 않은 userId:', userId);
+      return NextResponse.json({ error: '유효하지 않은 사용자 ID입니다.' }, { status: 400 });
+    }
 
-    if (!agentName || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined) {
-      return NextResponse.json({ error: '필수 필드가 누락되었습니다.' }, { status: 400 });
+    const requestData = await request.json();
+    console.log('요청 데이터:', requestData);
+    console.log('데이터 타입:', {
+      agentName: typeof requestData.agentName,
+      kills: typeof requestData.kills,
+      deaths: typeof requestData.deaths,
+      assists: typeof requestData.assists,
+      isWin: typeof requestData.isWin
+    });
+
+    const { agentName, kills, deaths, assists, isWin } = requestData;
+
+    if (!agentName) {
+      console.log('agentName 누락');
+      return NextResponse.json({ error: '요원 이름이 필요합니다.' }, { status: 400 });
+    }
+    if (kills === undefined || kills === null) {
+      console.log('kills 누락:', kills);
+      return NextResponse.json({ error: '킬 수가 필요합니다.' }, { status: 400 });
+    }
+    if (deaths === undefined || deaths === null) {
+      console.log('deaths 누락:', deaths);
+      return NextResponse.json({ error: '데스 수가 필요합니다.' }, { status: 400 });
+    }
+    if (assists === undefined || assists === null) {
+      console.log('assists 누락:', assists);
+      return NextResponse.json({ error: '어시스트 수가 필요합니다.' }, { status: 400 });
+    }
+    if (isWin === undefined || isWin === null) {
+      console.log('isWin 누락:', isWin);
+      return NextResponse.json({ error: '승/패 정보가 필요합니다.' }, { status: 400 });
     }
 
     const client = await clientPromise;
@@ -53,7 +89,7 @@ export async function PUT(request: NextRequest) {
             ? user.agentStats.map((stat: AgentStats) =>
                 stat.agentName === agentName ? updatedStats : stat
               )
-            : [...(user.agentStats || []), updatedStats],
+            : [updatedStats],
         },
       }
     );

@@ -51,8 +51,7 @@ export default function AdminPage() {
     deaths: 0,
     assists: 0,
     isWin: false,
-    isLoss: false,
-    matchDate: new Date().toISOString().split('T')[0]
+    isLoss: false
   });
   const { user, logout } = useAuth();
 
@@ -218,19 +217,27 @@ export default function AdminPage() {
       return;
     }
 
+    if (agentStats.isWin === undefined) {
+      setError('승/패를 선택해주세요.');
+      return;
+    }
+
+    const requestData = {
+      agentName: agentStats.agentName,
+      kills: agentStats.kills,
+      deaths: agentStats.deaths,
+      assists: agentStats.assists,
+      isWin: agentStats.isWin,
+    };
+    console.log('전송할 데이터:', requestData);
+
     try {
       const response = await fetch(`/api/users/${selectedUser}/agent-stats`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          agentName: agentStats.agentName,
-          kills: agentStats.kills,
-          deaths: agentStats.deaths,
-          assists: agentStats.assists,
-          isWin: agentStats.isWin,
-        }),
+        body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
@@ -246,8 +253,7 @@ export default function AdminPage() {
         deaths: 0,
         assists: 0,
         isWin: false,
-        isLoss: false,
-        matchDate: new Date().toISOString().split('T')[0]
+        isLoss: false
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
@@ -384,12 +390,6 @@ export default function AdminPage() {
                 placeholder="어시스트 수"
                 value={agentStats.assists}
                 onChange={(e) => setAgentStats({ ...agentStats, assists: parseInt(e.target.value) })}
-                className={styles.statsInput}
-              />
-              <input
-                type="date"
-                value={agentStats.matchDate}
-                onChange={(e) => setAgentStats({ ...agentStats, matchDate: e.target.value })}
                 className={styles.statsInput}
               />
               <div className={styles.checkboxGroup}>
