@@ -112,14 +112,15 @@ export default function MyPage() {
     return totalGames === 0 ? '0.0' : ((stats.wins / totalGames) * 100).toFixed(1);
   };
 
-  const calculateOverallKD = (agentStats: AgentStats[]) => {
+  const calculateOverallKD = (agentStats: AgentStats[] | undefined) => {
+    if (!agentStats || agentStats.length === 0) return '0.00';
     const totalKills = agentStats.reduce((sum, stats) => sum + stats.kills, 0);
     const totalDeaths = agentStats.reduce((sum, stats) => sum + stats.deaths, 0);
     return totalDeaths === 0 ? totalKills.toFixed(2) : (totalKills / totalDeaths).toFixed(2);
   };
 
-  const getMostPlayedAgent = (agentStats: AgentStats[]) => {
-    if (agentStats.length === 0) return null;
+  const getMostPlayedAgent = (agentStats: AgentStats[] | undefined) => {
+    if (!agentStats || agentStats.length === 0) return null;
 
     const sortedAgents = [...agentStats].sort((a, b) => {
       if (b.playCount !== a.playCount) {
@@ -165,7 +166,7 @@ export default function MyPage() {
           <div className={styles.statsSection}>
             <h2 className={styles.subtitle}>요원별 통계</h2>
             <div className={styles.agentStats}>
-              {userProfile.agentStats.map((stats) => (
+              {userProfile.agentStats?.map((stats) => (
                 <div key={stats.agentName} className={styles.agentCard}>
                   <h3 className={styles.agentName}>{stats.agentName}</h3>
                   <div className={styles.statGrid}>

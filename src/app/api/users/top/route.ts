@@ -40,7 +40,7 @@ export async function GET() {
         const userTier = await tiersCollection.findOne({ 'agents.userId': user._id.toString() });
         
         // 전체 통계 계산
-        const totalStats = user.agentStats?.reduce((acc, stat) => ({
+        const totalStats = (user.agentStats || []).reduce((acc, stat) => ({
           kills: acc.kills + stat.kills,
           deaths: acc.deaths + stat.deaths,
           assists: acc.assists + stat.assists,
