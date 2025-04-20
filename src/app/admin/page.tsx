@@ -58,8 +58,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     const checkAdmin = async () => {
-      const userId = localStorage.getItem('userId');
-      if (!userId) {
+      const token = localStorage.getItem('token');
+      if (!token) {
         router.push('/login');
         return;
       }
@@ -67,7 +67,7 @@ export default function AdminPage() {
       try {
         const response = await fetch('/api/users/me', {
           headers: {
-            'x-user-id': userId
+            'Authorization': `Bearer ${token}`
           }
         });
         
