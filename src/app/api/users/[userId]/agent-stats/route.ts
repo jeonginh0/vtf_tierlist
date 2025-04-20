@@ -15,11 +15,11 @@ interface AgentStats {
 // PUT: 요원 통계 업데이트
 export async function PUT(
   request: NextRequest,
-  context: { params: { userId: string } }
+  { params }: { params: { userId: string } }
 ) {
   try {
     const { agentName, kills, deaths, assists, isWin } = await request.json();
-    const userId = context.params.userId;
+    const userId = params.userId;
 
     if (!agentName || kills === undefined || deaths === undefined || assists === undefined || isWin === undefined) {
       return NextResponse.json(
