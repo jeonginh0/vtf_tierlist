@@ -2,9 +2,6 @@ import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { saveVerificationCode } from '@/lib/verification';
 
-// 이메일 인증 코드를 저장할 임시 저장소
-const verificationCodes = new Map<string, { code: string; timestamp: number }>();
-
 export async function POST(request: Request) {
   try {
     const { email } = await request.json();
@@ -66,25 +63,4 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-}
-
-// 인증 코드 검증을 위한 유틸리티 함수
-export function verifyCode(email: string, code: string): boolean {
-  const verification = verificationCodes.get(email);
-  
-  if (!verification) {
-    return false;
-  }
-
-  if (Date.now() > verification.timestamp) {
-    verificationCodes.delete(email);
-    return false;
-  }
-
-  if (verification.code !== code) {
-    return false;
-  }
-
-  verificationCodes.delete(email);
-  return true;
 } 
