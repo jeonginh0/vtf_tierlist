@@ -84,12 +84,12 @@ export async function PUT(
 // GET: 요원 통계 조회
 export async function GET(
   request: NextRequest,
-  context: { params: { userId: string } }
+  { params }: { params: { userId: string } }
 ) {
   try {
     const client = await clientPromise;
     const db = client.db('vtf');
-    const userId = context.params.userId;
+    const userId = params.userId;
 
     // 사용자 정보 조회
     const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
@@ -117,12 +117,12 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  context: { params: { userId: string } }
+  { params }: { params: { userId: string } }
 ) {
   try {
     const client = await clientPromise;
     const db = client.db('vtf');
-    const userId = context.params.userId;
+    const userId = params.userId;
     const { agent, kills, deaths, assists, isWin } = await request.json();
 
     // 필수 필드 검증
