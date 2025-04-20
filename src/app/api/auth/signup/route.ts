@@ -29,6 +29,16 @@ export async function POST(request: Request) {
 
     const db = client.db('vtf');
 
+    // username 중복 확인
+    const existingUserByUsername = await db.collection('users').findOne({ username: email.split('@')[0] });
+    if (existingUserByUsername) {
+      console.log('username 중복 발견:', email.split('@')[0]);
+      return NextResponse.json(
+        { error: '이미 사용 중인 아이디입니다.' },
+        { status: 400 }
+      );
+    }
+
     // 이메일 중복 확인
     const existingUserByEmail = await db.collection('users').findOne({ email });
     if (existingUserByEmail) {
@@ -66,6 +76,7 @@ export async function POST(request: Request) {
     // 사용자 생성
     const result = await db.collection('users').insertOne({
       email,
+      username: email.split('@')[0],
       nickname,
       valorantNickname,
       password: hashedPassword,
@@ -90,6 +101,10 @@ export async function POST(request: Request) {
     return NextResponse.json(user, { status: 201 });
   } catch (error) {
     console.error('사용자 생성 중 오류 발생:', error);
+    if (error instanceof Error) {
+      console.error('에러 상세:', error.message);
+      console.error('에러 스택:', error.stack);
+    }
     return NextResponse.json(
       { error: '회원가입에 실패했습니다. 잠시 후 다시 시도해주세요.' },
       { status: 500 }
