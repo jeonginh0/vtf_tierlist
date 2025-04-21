@@ -28,6 +28,8 @@ const RankingPage: React.FC = () => {
   const [selectedTier, setSelectedTier] = useState<string>('');
   const [selectedPosition, setSelectedPosition] = useState<string>('');
   const [selectedMainAgent, setSelectedMainAgent] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const agents = ['바이퍼', '소바', '브림스톤', '사이퍼', '제트', '레이즈', '브리치', '오멘', '킬조이', '스카이', '요루', '아스트라', '페이드', '하버', '게코', '데드록', '네온', '클로브'];
   const tiers = ['1티어', '2티어', '3티어', '4티어', '5티어'];
@@ -39,6 +41,11 @@ const RankingPage: React.FC = () => {
         console.log('API 호출 시작');
         const response = await fetch('/api/rankings');
         console.log('API 응답 상태:', response.status);
+        
+        if (!response.ok) {
+          throw new Error(`API 응답 오류: ${response.status}`);
+        }
+        
         const data = await response.json();
         console.log('API 응답 데이터:', JSON.stringify(data, null, 2));
         
@@ -62,9 +69,13 @@ const RankingPage: React.FC = () => {
           setUsers(usersWithMainAgent);
         } else {
           console.error('API 응답에 rankings 데이터가 없습니다:', data);
+          setError('랭킹 데이터를 불러올 수 없습니다.');
         }
       } catch (error) {
         console.error('사용자 목록 로딩 오류:', error);
+        setError(error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.');
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -89,25 +100,16 @@ const RankingPage: React.FC = () => {
     const matchesTier = !selectedTier || user.tier === selectedTier;
     const matchesPosition = !selectedPosition || user.preferredPosition === selectedPosition;
     const matchesMainAgent = !selectedMainAgent || user.mostUsedAgent === selectedMainAgent;
-    console.log('필터링된 사용자:', {
-      nickname: user.nickname,
-      mostUsedAgent: user.mostUsedAgent,
-      tier: user.tier,
-      preferredPosition: user.preferredPosition,
-      matchesAgent,
-      matchesTier,
-      matchesPosition,
-      matchesMainAgent
-    });
     return matchesAgent && matchesTier && matchesPosition && matchesMainAgent;
   });
 
-  console.log('최종 filteredUsers:', filteredUsers.map(user => ({
-    nickname: user.nickname,
-    mostUsedAgent: user.mostUsedAgent,
-    tier: user.tier,
-    preferredPosition: user.preferredPosition
-  })));
+  if (loading) {
+    return <div className={styles.loading}>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div className={styles.error}>{error}</div>;
+  }
 
   return (
     <div className={styles.container}>
@@ -176,24 +178,18 @@ const RankingPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredUsers.map((user, index) => {
-              console.log('전체 랭킹 - 사용자:', {
-                nickname: user.nickname,
-                mostUsedAgent: user.mostUsedAgent
-              });
-              return (
-                <tr key={user._id}>
-                  <td>{index + 1}</td>
-                  <td>{user.nickname}</td>
-                  <td>{user.tier}</td>
-                  <td>{user.preferredPosition}</td>
-                  <td>{user.mostUsedAgent || '없음'}</td>
-                  <td>{user.kda}</td>
-                  <td>{user.winRate}</td>
-                  <td>{calculateTotalGames(user)}</td>
-                </tr>
-              );
-            })}
+            {filteredUsers.map((user, index) => (
+              <tr key={user._id}>
+                <td>{index + 1}</td>
+                <td>{user.nickname}</td>
+                <td>{user.tier}</td>
+                <td>{user.preferredPosition}</td>
+                <td>{user.mostUsedAgent || '없음'}</td>
+                <td>{user.kda}</td>
+                <td>{user.winRate}</td>
+                <td>{calculateTotalGames(user)}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -202,11 +198,6 @@ const RankingPage: React.FC = () => {
       {positions.map(position => {
         const positionUsers = users.filter(user => user.preferredPosition === position);
         if (positionUsers.length === 0) return null;
-
-        console.log(`${position} 랭킹 - 사용자들:`, positionUsers.map(user => ({
-          nickname: user.nickname,
-          mostUsedAgent: user.mostUsedAgent
-        })));
 
         return (
           <div key={position} className={styles.rankingSection}>
@@ -224,23 +215,17 @@ const RankingPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {positionUsers.map((user, index) => {
-                  console.log(`${position} 랭킹 - 사용자:`, {
-                    nickname: user.nickname,
-                    mostUsedAgent: user.mostUsedAgent
-                  });
-                  return (
-                    <tr key={user._id}>
-                      <td>{index + 1}</td>
-                      <td>{user.nickname}</td>
-                      <td>{user.tier}</td>
-                      <td>{user.mostUsedAgent || '없음'}</td>
-                      <td>{user.kda}</td>
-                      <td>{user.winRate}</td>
-                      <td>{calculateTotalGames(user)}</td>
-                    </tr>
-                  );
-                })}
+                {positionUsers.map((user, index) => (
+                  <tr key={user._id}>
+                    <td>{index + 1}</td>
+                    <td>{user.nickname}</td>
+                    <td>{user.tier}</td>
+                    <td>{user.mostUsedAgent || '없음'}</td>
+                    <td>{user.kda}</td>
+                    <td>{user.winRate}</td>
+                    <td>{calculateTotalGames(user)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -251,11 +236,6 @@ const RankingPage: React.FC = () => {
       {tiers.map(tier => {
         const tierUsers = users.filter(user => user.tier === tier);
         if (tierUsers.length === 0) return null;
-
-        console.log(`${tier} 랭킹 - 사용자들:`, tierUsers.map(user => ({
-          nickname: user.nickname,
-          mostUsedAgent: user.mostUsedAgent
-        })));
 
         return (
           <div key={tier} className={styles.rankingSection}>
@@ -273,23 +253,17 @@ const RankingPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {tierUsers.map((user, index) => {
-                  console.log(`${tier} 랭킹 - 사용자:`, {
-                    nickname: user.nickname,
-                    mostUsedAgent: user.mostUsedAgent
-                  });
-                  return (
-                    <tr key={user._id}>
-                      <td>{index + 1}</td>
-                      <td>{user.nickname}</td>
-                      <td>{user.preferredPosition}</td>
-                      <td>{user.mostUsedAgent || '없음'}</td>
-                      <td>{user.kda}</td>
-                      <td>{user.winRate}</td>
-                      <td>{calculateTotalGames(user)}</td>
-                    </tr>
-                  );
-                })}
+                {tierUsers.map((user, index) => (
+                  <tr key={user._id}>
+                    <td>{index + 1}</td>
+                    <td>{user.nickname}</td>
+                    <td>{user.preferredPosition}</td>
+                    <td>{user.mostUsedAgent || '없음'}</td>
+                    <td>{user.kda}</td>
+                    <td>{user.winRate}</td>
+                    <td>{calculateTotalGames(user)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

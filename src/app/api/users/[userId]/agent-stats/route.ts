@@ -74,11 +74,11 @@ export async function PUT(request: NextRequest) {
     const newStats: AgentStats = {
       agentName,
       playCount: (existingStats?.playCount || 0) + 1,
-      kills,
-      deaths,
-      assists,
-      wins: isWin ? 1 : 0,
-      losses: isWin ? 0 : 1,
+      kills: (existingStats?.kills || 0) + kills,
+      deaths: (existingStats?.deaths || 0) + deaths,
+      assists: (existingStats?.assists || 0) + assists,
+      wins: (existingStats?.wins || 0) + (isWin ? 1 : 0),
+      losses: (existingStats?.losses || 0) + (isWin ? 0 : 1),
     };
 
     const result = await usersCollection.updateOne(
