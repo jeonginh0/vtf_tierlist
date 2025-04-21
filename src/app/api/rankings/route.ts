@@ -131,7 +131,6 @@ export async function GET(request: Request) {
       
       console.log('요원별 랭킹 데이터:', agentRankings);
       return NextResponse.json({ rankings: agentRankings });
-      
     } else if (type === 'position') {
       // 포지션별 랭킹
       const positionRankings: PositionRanking[] = [];
@@ -191,7 +190,6 @@ export async function GET(request: Request) {
       
       console.log('포지션별 랭킹 데이터:', positionRankings);
       return NextResponse.json({ rankings: positionRankings });
-      
     } else if (type === 'tier') {
       // 티어별 랭킹
       const tierRankings: TierRanking[] = [];
@@ -254,7 +252,6 @@ export async function GET(request: Request) {
       
       console.log('티어별 랭킹 데이터:', tierRankings);
       return NextResponse.json({ rankings: tierRankings });
-      
     } else {
       // 전체 랭킹
       const rankings: RankingUser[] = await Promise.all(users.map(async (user) => {
