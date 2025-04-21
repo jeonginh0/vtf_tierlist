@@ -70,7 +70,7 @@ export default function Rankings() {
   const [selectedTier, setSelectedTier] = useState<string>('');
   const { user, logout } = useAuth();
 
-  const agents = ['제트', '바이퍼', '소바', '브림스톤', '사이퍼', '레이즈', '킬조이', '스카이', '브리치', '오멘', '페이드', '하버'];
+  const agents = ['바이퍼', '소바', '브림스톤', '사이퍼', '제트', '레이즈', '브리치', '오멘', '킬조이', '스카이', '요루', '아스트라', '페이드', '하버', '게코', '데드록', '네온', '클로브'];
   const positions = ['타격대', '감시자', '전략가', '척후대'];
   const tierNumbers = ['1티어', '2티어', '3티어', '4티어', '5티어'];
 
