@@ -35,10 +35,12 @@ export async function PUT(request: NextRequest) {
       kills: typeof requestData.kills,
       deaths: typeof requestData.deaths,
       assists: typeof requestData.assists,
-      isWin: typeof requestData.isWin
+      wins: typeof requestData.wins,
+      losses: typeof requestData.losses,
+      playCount: typeof requestData.playCount
     });
 
-    const { agentName, kills, deaths, assists, isWin } = requestData;
+    const { agentName, kills, deaths, assists, wins, losses, playCount } = requestData;
 
     if (!agentName) {
       console.log('agentName 누락');
@@ -56,9 +58,17 @@ export async function PUT(request: NextRequest) {
       console.log('assists 누락:', assists);
       return NextResponse.json({ error: '어시스트 수가 필요합니다.' }, { status: 400 });
     }
-    if (isWin === undefined || isWin === null) {
-      console.log('isWin 누락:', isWin);
-      return NextResponse.json({ error: '승/패 정보가 필요합니다.' }, { status: 400 });
+    if (wins === undefined || wins === null) {
+      console.log('wins 누락:', wins);
+      return NextResponse.json({ error: '승리 수가 필요합니다.' }, { status: 400 });
+    }
+    if (losses === undefined || losses === null) {
+      console.log('losses 누락:', losses);
+      return NextResponse.json({ error: '패배 수가 필요합니다.' }, { status: 400 });
+    }
+    if (playCount === undefined || playCount === null) {
+      console.log('playCount 누락:', playCount);
+      return NextResponse.json({ error: '플레이 수가 필요합니다.' }, { status: 400 });
     }
 
     const client = await clientPromise;
@@ -73,12 +83,12 @@ export async function PUT(request: NextRequest) {
     const existingStats = user.agentStats?.find((stat: AgentStats) => stat.agentName === agentName);
     const newStats: AgentStats = {
       agentName,
-      playCount: (existingStats?.playCount || 0) + 1,
-      kills: (existingStats?.kills || 0) + kills,
-      deaths: (existingStats?.deaths || 0) + deaths,
-      assists: (existingStats?.assists || 0) + assists,
-      wins: (existingStats?.wins || 0) + (isWin ? 1 : 0),
-      losses: (existingStats?.losses || 0) + (isWin ? 0 : 1),
+      playCount,
+      kills,
+      deaths,
+      assists,
+      wins,
+      losses,
     };
 
     const result = await usersCollection.updateOne(
