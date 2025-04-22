@@ -29,7 +29,7 @@ const agentStatSchema = new Schema({
     type: Number,
     default: 0,
   },
-});
+}, { _id: false });
 
 const userSchema = new Schema({
   email: {

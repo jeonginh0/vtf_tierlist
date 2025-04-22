@@ -184,7 +184,9 @@ export default function AdminPage() {
   };
 
   const calculateUserStats = (user: User) => {
-    if (!user.agentStats || user.agentStats.length === 0) {
+    const agentStats = user.agentStats || [];
+
+    if (!agentStats || agentStats.length === 0) {
       return {
         averageKD: '0.00',
         totalGames: 0,
@@ -193,15 +195,15 @@ export default function AdminPage() {
       };
     }
 
-    const totalStats = user.agentStats.reduce((acc, stat) => ({
+    const totalStats = agentStats.reduce((acc, stat) => ({
       kills: acc.kills + stat.kills,
       deaths: acc.deaths + stat.deaths,
       totalGames: acc.totalGames + stat.wins + stat.losses
     }), { kills: 0, deaths: 0, totalGames: 0 });
 
-    const mostPlayedAgent = user.agentStats.reduce((max, current) => 
+    const mostPlayedAgent = agentStats.reduce((max, current) => 
       current.playCount > max.playCount ? current : max
-    , user.agentStats[0]);
+    , agentStats[0]);
 
     return {
       averageKD: totalStats.deaths === 0 ? totalStats.kills.toFixed(2) : (totalStats.kills / totalStats.deaths).toFixed(2),
