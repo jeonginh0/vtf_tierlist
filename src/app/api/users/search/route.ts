@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     console.log('데이터베이스 선택 성공');
     
     const user = await db.collection('users').findOne(
-      { nickname: { $regex: new RegExp(nickname, 'i') } },
+      { nickname: nickname },
       {
         projection: {
           _id: 1,
