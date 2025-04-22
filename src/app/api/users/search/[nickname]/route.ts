@@ -3,6 +3,10 @@ import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
 import { getMostUsedAgent } from '@/utils/agentStats';
 
+// 캐싱 비활성화 설정
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface AgentStat {
   agentName: string;
   playCount: number;
