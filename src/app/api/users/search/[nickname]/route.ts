@@ -32,9 +32,21 @@ export async function GET(request: NextRequest) {
     const { pathname } = request.nextUrl;
     const nickname = decodeURIComponent(pathname.split('/').pop() || '');
 
-    console.log('검색할 닉네임:', nickname);
+    if (!nickname) {
+      return NextResponse.json(
+        { error: '닉네임이 필요합니다.' },
+        { status: 400 }
+      );
+    }
 
-    await connectDB();
+    // MongoDB 연결
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { error: '데이터베이스 연결에 실패했습니다.' },
+        { status: 500 }
+      );
+    }
 
     const user = await User.findOne(
       { nickname },

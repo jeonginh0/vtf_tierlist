@@ -7,13 +7,15 @@ if (!process.env.MONGODB_URI) {
 
 const uri = process.env.MONGODB_URI;
 const options = {
-  serverSelectionTimeoutMS: 5000, // 서버 선택 타임아웃 5초
-  socketTimeoutMS: 30000, // 소켓 타임아웃 30초
-  connectTimeoutMS: 10000, // 연결 타임아웃 10초
+  serverSelectionTimeoutMS: 10000, // 서버 선택 타임아웃 10초
+  socketTimeoutMS: 45000, // 소켓 타임아웃 45초
+  connectTimeoutMS: 15000, // 연결 타임아웃 15초
   maxPoolSize: 50, // 최대 연결 풀 크기
   minPoolSize: 10, // 최소 연결 풀 크기
   maxIdleTimeMS: 30000, // 유휴 연결 타임아웃 30초
   waitQueueTimeoutMS: 30000, // 대기 큐 타임아웃 30초
+  retryWrites: true, // 쓰기 실패 시 재시도
+  retryReads: true, // 읽기 실패 시 재시도
 };
 
 console.log('MongoDB 연결 설정:', {
@@ -91,16 +93,12 @@ export async function connectDB() {
       collections: await db.listCollections().toArray()
     });
     
+    // 연결 상태 확인
+    await db.command({ ping: 1 });
+    
     return db;
   } catch (error) {
-    console.error('MongoDB 연결 실패:', {
-      error: error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      } : error,
-      uri: uri.replace(/\/\/[^@]+@/, '//***:***@')
-    });
-    throw error;
+    console.error('MongoDB 연결 실패:', error);
+    throw new Error('데이터베이스 연결에 실패했습니다.');
   }
 } 

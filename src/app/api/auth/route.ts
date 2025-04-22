@@ -5,14 +5,21 @@ import bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
-    await connectDB;
-    
     const { username, password } = await request.json();
     
     if (!username || !password) {
       return NextResponse.json(
         { error: '아이디와 비밀번호를 입력해주세요.' },
         { status: 400 }
+      );
+    }
+
+    // MongoDB 연결
+    const db = await connectDB();
+    if (!db) {
+      return NextResponse.json(
+        { error: '데이터베이스 연결에 실패했습니다.' },
+        { status: 500 }
       );
     }
 
