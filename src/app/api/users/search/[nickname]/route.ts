@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
 
@@ -22,12 +22,19 @@ interface UserWithStats {
   agentStats: AgentStat[];
 }
 
+function getMostUsedAgent(agentStats: AgentStat[]): string {
+  if (!agentStats || agentStats.length === 0) return '없음';
+  return agentStats.reduce((prev, current) => 
+    (prev.playCount > current.playCount) ? prev : current
+  ).agentName;
+}
+
 export async function GET(
-  request: Request,
-  context: { params: { nickname: string } }
+  request: NextRequest,
+  { params }: { params: { nickname: string } }
 ) {
   try {
-    const { nickname } = await context.params;
+    const { nickname } = params;
     const decodedNickname = decodeURIComponent(nickname);
     console.log('검색할 닉네임:', decodedNickname);
     
@@ -133,29 +140,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
-
-function getMostUsedAgent(agentStats: Array<{
-  agentName: string;
-  playCount: number;
-  kills: number;
-  deaths: number;
-  assists: number;
-}>) {
-  if (!agentStats || agentStats.length === 0) return '없음';
-
-  // 플레이 횟수와 KDA를 기준으로 정렬
-  const sortedAgents = [...agentStats].sort((a, b) => {
-    // 먼저 플레이 횟수로 비교
-    if (b.playCount !== a.playCount) {
-      return b.playCount - a.playCount;
-    }
-    
-    // 플레이 횟수가 같으면 KDA로 비교
-    const aKDA = a.deaths > 0 ? (a.kills + a.assists) / a.deaths : a.kills + a.assists;
-    const bKDA = b.deaths > 0 ? (b.kills + b.assists) / b.deaths : b.kills + b.assists;
-    return bKDA - aKDA;
-  });
-
-  return sortedAgents[0].agentName;
 } 
