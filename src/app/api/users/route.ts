@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { clientPromise } from '@/lib/mongodb';
-import { ObjectId } from 'mongodb';
 
 interface AgentStats {
   agentName: string;
@@ -95,6 +94,8 @@ export async function POST(request: Request) {
       nickname,
       valorantNickname,
       preferredPosition,
+      tier: '언랭크',
+      mostUsedAgent: '없음',
       role: 'USER',
       agentStats: [],
       createdAt: now,
