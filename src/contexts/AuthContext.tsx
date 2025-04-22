@@ -1,6 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { jwtDecode } from 'jwt-decode';
 
 interface User {
   id: string;
@@ -19,25 +21,41 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    // 페이지 로드 시 로컬 스토리지에서 사용자 정보 복원
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    // 페이지 로드 시 로컬 스토리지에서 토큰 확인
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const decoded = jwtDecode(token) as { userId: string; email: string; role: string; nickname: string };
+        setUser({
+          id: decoded.userId,
+          email: decoded.email,
+          nickname: decoded.nickname,
+          role: decoded.role
+        });
+      } catch (error) {
+        console.error('토큰 디코딩 실패:', error);
+        localStorage.removeItem('token');
+      }
     }
   }, []);
 
   const login = (userData: User, token: string) => {
-    setUser(userData);
-    localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', token);
+    setUser({
+      id: userData.id,
+      email: userData.email,
+      nickname: userData.nickname,
+      role: userData.role
+    });
   };
 
   const logout = () => {
-    setUser(null);
-    localStorage.removeItem('user');
     localStorage.removeItem('token');
+    setUser(null);
+    router.push('/login');
   };
 
   return (

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import TierRow from './TierRow';
+import styles from '@/styles/TierList.module.css';
 
 interface Agent {
   userId: string;
@@ -20,17 +21,15 @@ interface TierListProps {
 
 const TierList: React.FC<TierListProps> = ({ tiers }) => {
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
-      <div className="border border-gray-700 rounded-lg overflow-hidden">
-        {tiers.map((tier) => (
-          <TierRow
-            key={tier.tier}
-            tier={tier.tier}
-            backgroundColor={tier.color}
-            agents={tier.agents.map(agent => agent.nickname)}
-          />
-        ))}
-      </div>
+    <div className={styles.tierListContainer}>
+      {tiers.map((tier) => (
+        <TierRow
+          key={tier.tier}
+          tier={tier.tier}
+          backgroundColor={tier.color}
+          agents={tier.agents.map(agent => agent.nickname)}
+        />
+      ))}
     </div>
   );
 };

@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import styles from '@/styles/MainProfile.module.css';
-import { jwtDecode } from 'jwt-decode';
 
 interface UserStats {
   _id: string;
@@ -34,8 +33,8 @@ interface UserStats {
   mostUsedAgent: string;
 }
 
-export default function MyPage() {
-  const router = useRouter();
+export default function ProfilePage() {
+  const { nickname } = useParams();
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,39 +42,22 @@ export default function MyPage() {
 
   useEffect(() => {
     const fetchUserStats = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
       try {
-        // 토큰에서 사용자 정보 디코딩
-        const decoded = jwtDecode(token) as { userId: string; email: string; role: string; nickname: string };
-        const response = await fetch(`/api/users/search/${decoded.nickname}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
+        const response = await fetch(`/api/users/search/${nickname}`);
         if (!response.ok) {
           throw new Error('사용자를 찾을 수 없습니다.');
         }
         const data = await response.json();
         setUserStats(data);
-      } catch (error) {
-        console.error('Error fetching user stats:', error);
+      } catch {
         setError('사용자 정보를 불러오는데 실패했습니다.');
-        if (error instanceof Error && error.message === '사용자를 찾을 수 없습니다.') {
-          router.push('/login');
-        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserStats();
-  }, [router]);
+  }, [nickname]);
 
   if (loading) {
     return (

@@ -41,17 +41,22 @@ export default function TierListPage() {
   }, []);
 
   if (isLoading) {
-    return <div className="text-center py-8">로딩 중...</div>;
+    return (
+      <>
+        <Header currentUser={user} onLogout={logout} />
+        <div className={styles.loadingContainer}>
+          <div className={styles.loadingSpinner}></div>
+        </div>
+      </>
+    );
   }
 
   return (
     <>
-      <Header 
-        currentUser={user}
-        onLogout={logout}
-      />
+      <Header currentUser={user} onLogout={logout} />
       <main className={styles.mainContent}>
         <div className={styles.container}>
+          <h1 className={styles.title}>티어 리스트</h1>
           <TierList tiers={tiers} />
         </div>
       </main>

@@ -1,150 +1,110 @@
 .mainContent {
-  padding: 20px;
+  padding: 2rem;
   min-height: calc(100vh - 60px);
-  background-color: #f5f5f5;
+  background-color: #f8f9fa;
+  background-image: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 100px;
+  margin-top: 80px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .rankingsSection {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rankingsSection:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 .sectionTitle {
-  font-size: 24px;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-.tabs {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
-}
-
-.tab {
-  padding: 8px 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: #666;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.tab:hover {
-  background-color: #f0f0f0;
-}
-
-.tab.active {
-  color: #007bff;
-  background-color: #e6f2ff;
-}
-
-.filterButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-  padding: 10px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-}
-
-.filterButton {
-  padding: 8px 16px;
-  border: 1px solid #ddd;
-  border-radius: 20px;
-  background-color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 14px;
-  min-width: 80px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 2rem;
   text-align: center;
-}
-
-.filterButton:hover {
-  background-color: #f0f0f0;
-}
-
-.filterButton.active {
-  background-color: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
-.rankingSection {
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  letter-spacing: -0.5px;
 }
 
 .rankingsTable {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 10px;
+  margin-top: 1rem;
 }
 
 .rankingsTable th,
 .rankingsTable td {
-  padding: 12px;
+  padding: 1rem;
   text-align: center;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .rankingsTable th {
   background-color: #f8f9fa;
   font-weight: 600;
-  text-align: center;
+  color: #333;
 }
 
 .rankingsTable tr:hover {
   background-color: #f8f9fa;
 }
 
-.rankingRow:hover {
-  background-color: #f8f9fa;
+.positionCell,
+.agentCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
-.rank {
-  font-weight: 600;
-  color: #007bff;
-}
-
-.kda {
-  font-weight: 600;
-  color: #28a745;
-}
-
-.winRate {
-  font-weight: 600;
-  color: #dc3545;
-}
-
-.error {
-  color: #dc3545;
-  padding: 10px;
-  background-color: #f8d7da;
-  border-radius: 4px;
-  margin-bottom: 20px;
+.positionIcon,
+.agentIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 1.5rem;
+  color: #6c757d;
+}
+
+.error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 1.5rem;
+  color: #dc3545;
   text-align: center;
-  padding: 20px;
-  color: #666;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 /* 요원별 랭킹 스타일 */

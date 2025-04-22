@@ -402,4 +402,37 @@
 
 .mostPlayedAgent {
   color: #ff4757;
+}
+
+.positionInfo,
+.agentInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.positionIcon,
+.agentIcon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.infoLabel {
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.infoValue {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
 } 

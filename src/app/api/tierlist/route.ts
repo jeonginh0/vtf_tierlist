@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { clientPromise } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 // 티어 정보 타입 정의
@@ -75,6 +75,7 @@ export async function PUT(request: Request) {
     }
 
     if (action === 'remove') {
+      // 티어에서 사용자 제거
       const result = await tiersCollection.updateOne(
         { tier: tierName },
         { $pull: { agents: { userId } } }
@@ -86,6 +87,12 @@ export async function PUT(request: Request) {
           { status: 404 }
         );
       }
+
+      // User 모델의 tier 필드 업데이트
+      await usersCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { tier: '미배정' } }
+      );
     } else {
       // 이미 다른 티어에 있는지 확인
       const existingTier = await tiersCollection.findOne({
@@ -119,6 +126,12 @@ export async function PUT(request: Request) {
           { status: 404 }
         );
       }
+
+      // User 모델의 tier 필드 업데이트
+      await usersCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: { tier: tierName } }
+      );
     }
 
     return NextResponse.json({ success: true });

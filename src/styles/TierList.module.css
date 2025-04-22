@@ -1,7 +1,7 @@
 .mainContent {
   min-height: 100vh;
-  padding: 2rem;
-  background-color: #f8f9fa;
+  background-color: #f9fafb;
+  padding-top: 80px;
 }
 
 .container {
@@ -10,11 +10,102 @@
   padding: 2rem;
 }
 
-.title {
-  font-size: 2.5rem;
+.tierListContainer {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.tierRow {
+  display: flex;
+  min-height: 120px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.tierRow:last-child {
+  border-bottom: none;
+}
+
+.tierRow:hover {
+  background-color: #f8fafc;
+}
+
+.tierLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  flex-shrink: 0;
+  padding: 1rem;
+}
+
+.tierLabelText {
+  font-size: 2rem;
   font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 1rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.agentsContainer {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem;
+  align-content: flex-start;
+  overflow-y: auto;
+  background-color: white;
+}
+
+.agentTag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.agentTag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.agentName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1f2937;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 80px);
+}
+
+.loadingSpinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid #e5e7eb;
+  border-radius: 50%;
+  border-top-color: #3b82f6;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 2rem;
   text-align: center;
 }
 

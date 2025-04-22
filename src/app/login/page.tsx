@@ -71,7 +71,8 @@ export default function LoginPage() {
 
       if (response.ok) {
         // 로그인 성공 시 사용자 정보와 토큰 저장
-        login(data.user, data.token);
+        const { user, token } = data;
+        login(user, token);
         router.push('/');
       } else {
         if (response.status === 401) {

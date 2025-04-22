@@ -1,12 +1,14 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import styles from '@/styles/Header.module.css'
+import styles from '@/styles/Header.module.css';
 
 interface HeaderProps {
   currentUser: {
+    id: string;
+    email: string;
     nickname: string;
     role: string;
   } | null;
@@ -14,21 +16,32 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
+  const [searchTerm, setSearchTerm] = useState('');
   const router = useRouter();
 
   const handleLogout = () => {
-    // 로컬 스토리지 클리어
     localStorage.clear();
-    
-    // 로그아웃 콜백 실행
     onLogout();
-    
-    // 홈페이지로 리다이렉트
     router.push('/');
   };
 
   const handleMyPageClick = () => {
     router.push('/mypage');
+  };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      try {
+        const response = await fetch(`/api/users/search/${searchTerm}`);
+        if (!response.ok) {
+          throw new Error('사용자를 찾을 수 없습니다.');
+        }
+        router.push(`/profile/${searchTerm}`);
+      } catch (error) {
+        alert('사용자를 찾을 수 없습니다.');
+      }
+    }
   };
 
   return (
@@ -39,23 +52,35 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
             <Link href="/" className={styles.logoText}>
               VTF
             </Link>
-            <nav className={styles.nav}>
-              <div className={styles.navLinks}>
-                <Link href="/rankings" className={styles.navLink}>
-                  랭킹
-                </Link>
-                <Link href="/tierlist" className={styles.navLink}>
-                  티어표
-                </Link>
-                {currentUser?.role === 'admin' && (
-                  <Link href="/admin" className={styles.navLink}>
-                    관리자
-                  </Link>
-                )}
-              </div>
-            </nav>
           </div>
+          <nav className={styles.nav}>
+            <div className={styles.navLinks}>
+              <Link href="/rankings" className={styles.navLink}>
+                랭킹
+              </Link>
+              <Link href="/tierlist" className={styles.navLink}>
+                티어표
+              </Link>
+              {currentUser?.role === 'admin' && (
+                <Link href="/admin" className={styles.navLink}>
+                  관리자
+                </Link>
+              )}
+            </div>
+          </nav>
           <div className={styles.actions}>
+            <form onSubmit={handleSearch} className={styles.searchForm}>
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="닉네임 검색"
+                className={styles.searchInput}
+              />
+              <button type="submit" className={styles.searchButton}>
+                검색
+              </button>
+            </form>
             {currentUser ? (
               <div className={styles.userSection}>
                 <button onClick={handleMyPageClick} className={styles.userName}>

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import styles from '@/styles/TierList.module.css';
 
 interface TierRowProps {
   tier: string;
@@ -14,20 +15,20 @@ const TierRow: React.FC<TierRowProps> = ({
   agents
 }) => {
   return (
-    <div className="flex w-full h-[150px] border-b border-gray-700">
+    <div className={styles.tierRow}>
       <div 
-        className="flex items-center justify-center w-[120px] h-full shrink-0" 
+        className={styles.tierLabel}
         style={{ backgroundColor }}
       >
-        <span className="text-2xl font-bold text-gray-800">{tier}</span>
+        <span className={styles.tierLabelText}>{tier}</span>
       </div>
-      <div className="flex-1 flex flex-wrap content-start gap-2 p-4 bg-gray-800 overflow-y-auto">
+      <div className={styles.agentsContainer}>
         {agents.map((agent, index) => (
           <div 
             key={index}
-            className="px-4 py-2 bg-gray-700 rounded-full text-white flex items-center gap-2 text-lg"
+            className={styles.agentTag}
           >
-            <span>{agent}</span>
+            <span className={styles.agentName}>{agent}</span>
           </div>
         ))}
       </div>

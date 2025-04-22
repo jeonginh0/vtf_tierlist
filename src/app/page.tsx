@@ -9,8 +9,8 @@ import { useAuth } from '@/contexts/AuthContext';
 interface TopPlayer {
   nickname: string;
   tier: string;
-  kda: string;
-  winRate: string;
+  kda: number;
+  winRate: number;
   totalGames: number;
 }
 
@@ -23,12 +23,18 @@ export default function Home() {
   useEffect(() => {
     const fetchTopPlayers = async () => {
       try {
-        const response = await fetch('/api/users/top');
+        const response = await fetch('/api/rankings');
         if (!response.ok) {
           throw new Error('상위 플레이어 정보를 불러올 수 없습니다.');
         }
         const data = await response.json();
-        setTopPlayers(data.topPlayers);
+        setTopPlayers(data.rankings.slice(0, 3).map((player: TopPlayer) => ({
+          nickname: player.nickname,
+          tier: player.tier,
+          kda: player.kda,
+          winRate: player.winRate,
+          totalGames: player.totalGames || 0
+        })));
       } catch (err) {
         setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
       } finally {

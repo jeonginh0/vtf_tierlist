@@ -1,7 +1,8 @@
 'use Client'
 
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { connectDB } from '@/lib/mongodb';
+import User from '@/models/User';
 import { ObjectId } from 'mongodb';
 
 interface AgentStats {
@@ -84,8 +85,7 @@ export async function GET(request: Request) {
     
     console.log('랭킹 API 호출 - 타입:', type);
     
-    const client = await clientPromise;
-    const db = client.db('vtf');
+    const db = await connectDB();
     
     const users = await db.collection('users').find({}).toArray() as User[];
     console.log('DB에서 가져온 사용자 수:', users.length);

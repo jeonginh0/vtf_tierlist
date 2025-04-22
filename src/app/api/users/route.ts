@@ -1,70 +1,42 @@
 import { NextResponse } from 'next/server';
-import clientPromise from '@/lib/mongodb';
+import { clientPromise } from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
 interface AgentStats {
   agentName: string;
   playCount: number;
-  kills: number;
-  deaths: number;
   wins: number;
   losses: number;
+  kills: number;
+  deaths: number;
+  assists: number;
 }
 
 interface User {
-  _id: ObjectId;
+  _id: string;
   email: string;
-  password: string;
+  password?: string;
   nickname: string;
   valorantNickname: string;
   preferredPosition: string;
+  tier: string;
   role: string;
   agentStats: AgentStats[];
-  mostUsedAgent?: string;
+  mostUsedAgent: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-type SanitizedUser = Omit<User, 'password'>;
-
-const getMostUsedAgent = (agentStats: AgentStats[]) => {
-  if (!agentStats || agentStats.length === 0) return '미지정';
-
-  const sortedAgents = [...agentStats].sort((a, b) => {
-    if (b.playCount !== a.playCount) {
-      return b.playCount - a.playCount;
-    }
-    const aKD = a.deaths === 0 ? a.kills : a.kills / a.deaths;
-    const bKD = b.deaths === 0 ? b.kills : b.kills / b.deaths;
-    return bKD - aKD;
-  });
-
-  return sortedAgents[0].agentName;
-};
-
-// GET: 모든 사용자 조회
 export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db('vtf');
     
-    const users = await db.collection('users').find({}).toArray();
+    const users = await db.collection<User>('users')
+      .find({}, { projection: { password: 0 } })
+      .toArray();
     
-    // 민감한 정보 제외
-    const sanitizedUsers: SanitizedUser[] = users.map(user => ({
-      _id: user._id,
-      email: user.email,
-      nickname: user.nickname,
-      valorantNickname: user.valorantNickname,
-      preferredPosition: user.preferredPosition,
-      role: user.role,
-      agentStats: user.agentStats || [],
-      mostUsedAgent: getMostUsedAgent(user.agentStats || []),
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    }));
-    
-    return NextResponse.json({ users: sanitizedUsers });
+    return NextResponse.json({ users });
   } catch (error) {
     console.error('사용자 목록 조회 중 오류 발생:', error);
     return NextResponse.json(
