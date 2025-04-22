@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import styles from '@/styles/Rankings.module.css';
+import Image from 'next/image';
 
 interface RankingUser {
   _id: string;
@@ -76,9 +77,11 @@ export default function Rankings() {
                       <td>{user.nickname}</td>
                       <td>
                         <div className={styles.positionCell}>
-                          <img 
+                          <Image 
                             src={`/position/${user.preferredPosition}.svg`} 
                             alt={user.preferredPosition}
+                            width={24}
+                            height={24}
                             className={styles.positionIcon}
                           />
                           <span>{user.preferredPosition}</span>
@@ -87,9 +90,11 @@ export default function Rankings() {
                       <td>{user.tier}</td>
                       <td>
                         <div className={styles.agentCell}>
-                          <img 
+                          <Image 
                             src={`/agent/${user.mostUsedAgent}.svg`} 
                             alt={user.mostUsedAgent}
+                            width={24}
+                            height={24}
                             className={styles.agentIcon}
                           />
                           <span>{user.mostUsedAgent}</span>

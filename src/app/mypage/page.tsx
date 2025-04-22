@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import { useAuth } from '@/contexts/AuthContext';
 import styles from '@/styles/MainProfile.module.css';
 import { jwtDecode } from 'jwt-decode';
+import Image from 'next/image';
 
 interface UserStats {
   _id: string;
@@ -130,9 +131,11 @@ export default function MyPage() {
               <h2 className={`${styles.statTitle} ${styles.statTitleBlue}`}>주요 요원</h2>
               <div className={styles.statLabel}>
                 <div className={`${styles.statCircle} ${styles.statCircleBlue}`}>
-                  <img 
+                  <Image 
                     src={`/agent/${userStats.mostUsedAgent}.svg`} 
                     alt={userStats.mostUsedAgent}
+                    width={40}
+                    height={40}
                     className={styles.agentIcon}
                   />
                 </div>
@@ -144,9 +147,11 @@ export default function MyPage() {
               <h2 className={`${styles.statTitle} ${styles.statTitleGreen}`}>선호 포지션</h2>
               <div className={styles.statLabel}>
                 <div className={`${styles.statCircle} ${styles.statCircleGreen}`}>
-                  <img 
+                  <Image 
                     src={`/position/${userStats.preferredPosition}.svg`} 
                     alt={userStats.preferredPosition}
+                    width={40}
+                    height={40}
                     className={styles.positionIcon}
                   />
                 </div>
@@ -198,9 +203,11 @@ export default function MyPage() {
                       <tr key={stat.agentName} className={styles.tableRow}>
                         <td className={styles.tableCell}>
                           <div className={styles.agentCell}>
-                            <img 
+                            <Image 
                               src={`/agent/${stat.agentName}.svg`} 
                               alt={stat.agentName}
+                              width={24}
+                              height={24}
                               className={styles.agentIcon}
                             />
                             <span>{stat.agentName}</span>

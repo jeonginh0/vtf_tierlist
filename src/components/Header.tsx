@@ -17,6 +17,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const router = useRouter();
 
   const handleLogout = () => {
@@ -31,16 +32,14 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (searchTerm.trim()) {
-      try {
-        const response = await fetch(`/api/users/search/${searchTerm}`);
-        if (!response.ok) {
-          throw new Error('사용자를 찾을 수 없습니다.');
-        }
-        router.push(`/profile/${searchTerm}`);
-      } catch (error) {
-        alert('사용자를 찾을 수 없습니다.');
-      }
+    if (!searchTerm.trim()) return;
+
+    try {
+      const response = await fetch(`/api/users/search?nickname=${encodeURIComponent(searchTerm)}`);
+      const data = await response.json();
+      setSearchResults(data.users);
+    } catch {
+      setSearchResults([]);
     }
   };
 
