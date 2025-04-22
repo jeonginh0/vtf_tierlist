@@ -44,7 +44,11 @@ export default function ProfilePage() {
   useEffect(() => {
     const fetchUserStats = async () => {
       try {
-        const response = await fetch(`/api/users/search/${nickname}`);
+        const response = await fetch(`/api/users/search/${nickname}`,{
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
         if (!response.ok) {
           throw new Error('사용자를 찾을 수 없습니다.');
         }

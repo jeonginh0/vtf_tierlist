@@ -34,7 +34,11 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
     if (!searchTerm.trim()) return;
 
     try {
-      const response = await fetch(`/api/users/search?nickname=${encodeURIComponent(searchTerm)}`);
+      const response = await fetch(`/api/users/search?nickname=${encodeURIComponent(searchTerm)}`, {
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (!response.ok) {
         throw new Error('사용자를 찾을 수 없습니다.');
       }
