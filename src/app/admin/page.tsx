@@ -451,15 +451,15 @@ export default function AdminPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.find(u => u._id === selectedUser)?.agentStats.map((stat) => (
-                      <tr key={stat.agentName}>
-                        <td>{stat.agentName}</td>
-                        <td>{stat.playCount}</td>
-                        <td>{stat.deaths === 0 ? (stat.kills).toFixed(2) : (stat.kills / stat.deaths).toFixed(2)}</td>
-                        <td>{((stat.wins / (stat.wins + stat.losses)) * 100).toFixed(1)}%</td>
-                        <td>{stat.wins}승 {stat.losses}패</td>
-                      </tr>
-                    ))}
+                  {users.find(u => u._id === selectedUser)?.agentStats?.map((stat) => (
+                    <tr key={stat.agentName}>
+                      <td>{stat.agentName}</td>
+                      <td>{stat.playCount}</td>
+                      <td>{stat.deaths === 0 ? stat.kills.toFixed(2) : (stat.kills / stat.deaths).toFixed(2)}</td>
+                      <td>{((stat.wins / (stat.wins + stat.losses)) * 100).toFixed(1)}%</td>
+                      <td>{stat.wins}승 {stat.losses}패</td>
+                    </tr>
+                  ))}
                   </tbody>
                 </table>
               </div>
