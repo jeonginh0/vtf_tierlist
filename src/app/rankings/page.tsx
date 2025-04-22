@@ -27,7 +27,11 @@ export default function Rankings() {
   useEffect(() => {
     const fetchRankings = async () => {
       try {
-        const response = await fetch('/api/rankings');
+        const response = await fetch('/api/rankings', {
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
         if (!response.ok) {
           throw new Error('랭킹 정보를 불러올 수 없습니다.');
         }
