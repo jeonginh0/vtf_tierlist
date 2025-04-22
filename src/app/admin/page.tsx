@@ -155,6 +155,7 @@ export default function AdminPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-store',
         },
         body: JSON.stringify({
           userId,
@@ -179,7 +180,7 @@ export default function AdminPage() {
     setAgentStats(prev => ({
       ...prev,
       isWin: type === 'win',
-      isLoss: type === 'loss'
+      isLoss: type === 'loss',
     }));
   };
 
@@ -228,6 +229,7 @@ export default function AdminPage() {
     const existingAgent = userData?.agentStats.find((a) => a.agentName === agentStats.agentName);
   
     const updatedStats = {
+      userId: selectedUser,
       agentName: agentStats.agentName,
       kills: (existingAgent?.kills || 0) + agentStats.kills,
       deaths: (existingAgent?.deaths || 0) + agentStats.deaths,
@@ -235,10 +237,12 @@ export default function AdminPage() {
       wins: (existingAgent?.wins || 0) + (agentStats.isWin ? 1 : 0),
       losses: (existingAgent?.losses || 0) + (agentStats.isLoss ? 1 : 0),
       playCount: (existingAgent?.playCount || 0) + 1,
+      isWin: agentStats.isWin,  // 승리 여부를 추가
+      isLoss: agentStats.isLoss  // 패배 여부를 추가
     };
-  
+
     try {
-      const response = await fetch(`/api/users/${selectedUser}/agent-stats`, {
+      const response = await fetch(`/api/users/id/${selectedUser}/agent-stats`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -265,7 +269,6 @@ export default function AdminPage() {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
     }
   };
-  
 
   if (loading) {
     return (
