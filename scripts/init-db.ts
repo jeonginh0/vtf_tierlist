@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
-import connectDB from '../src/lib/mongodb.js';
-import User from '../src/models/User.js';
-import TierList from '../src/models/TierList.js';
+import { connectDB } from '../src/lib/mongodb';
+import User from '../src/models/User';
+import TierList from '../src/models/TierList';
 import bcrypt from 'bcryptjs';
 
 // 환경 변수 로드
