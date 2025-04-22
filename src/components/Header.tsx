@@ -35,14 +35,13 @@ const Header: React.FC<HeaderProps> = ({ currentUser, onLogout }) => {
 
     try {
       const response = await fetch(`/api/users/search?nickname=${encodeURIComponent(searchTerm)}`);
-      const data = await response.json();
-      if (data.users && data.users.length > 0) {
-        router.push(`/profile/${data.users[0].nickname}`);
-      } else {
-        alert('사용자를 찾을 수 없습니다.');
+      if (!response.ok) {
+        throw new Error('사용자를 찾을 수 없습니다.');
       }
-    } catch {
-      alert('검색 중 오류가 발생했습니다.');
+      const user = await response.json();
+      router.push(`/profile/${user.nickname}`);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : '검색 중 오류가 발생했습니다.');
     }
   };
 

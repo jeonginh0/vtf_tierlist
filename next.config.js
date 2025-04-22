@@ -5,7 +5,9 @@ const nextConfig = {
     domains: ['vtfgg.netlify.app'],
   },
   experimental: {
-    serverActions: true,
+    serverActions: {
+      allowedOrigins: ['localhost:3000', 'vtfgg.netlify.app'],
+    },
   },
 }
 

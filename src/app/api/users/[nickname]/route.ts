@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     const typedUser = user as unknown as UserWithStats;
+    console.log('사용자 요원 통계:', typedUser.agentStats);
 
     const totalGames = typedUser.agentStats.reduce((sum, stat) => sum + stat.playCount, 0);
     const totalWins = typedUser.agentStats.reduce((sum, stat) => sum + stat.wins, 0);
@@ -69,7 +70,9 @@ export async function GET(request: NextRequest) {
       ? ((totalKills + totalAssists) / totalDeaths).toFixed(2)
       : '0.00';
 
+    console.log('getMostUsedAgent 호출 전');
     const mostUsedAgent = getMostUsedAgent(typedUser.agentStats);
+    console.log('getMostUsedAgent 호출 후, 결과:', mostUsedAgent);
 
     return NextResponse.json({
       ...typedUser,
@@ -91,3 +94,60 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+export async function PUT(request: NextRequest) {
+  try {
+    const { pathname } = request.nextUrl;
+    const nickname = decodeURIComponent(pathname.split('/').pop() || '');
+    const body = await request.json();
+
+    await connectDB();
+
+    const user = await User.findOneAndUpdate(
+      { nickname },
+      { $set: body },
+      { new: true }
+    );
+
+    if (!user) {
+      return NextResponse.json(
+        { error: '사용자를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(user);
+  } catch (error) {
+    console.error('사용자 정보 업데이트 중 오류 발생:', error);
+    return NextResponse.json(
+      { error: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { pathname } = request.nextUrl;
+    const nickname = decodeURIComponent(pathname.split('/').pop() || '');
+
+    await connectDB();
+
+    const result = await User.deleteOne({ nickname });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { error: '사용자를 찾을 수 없습니다.' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: '사용자가 성공적으로 삭제되었습니다.' });
+  } catch (error) {
+    console.error('사용자 삭제 중 오류 발생:', error);
+    return NextResponse.json(
+      { error: '서버 오류가 발생했습니다.' },
+      { status: 500 }
+    );
+  }
+} 

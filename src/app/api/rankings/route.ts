@@ -4,6 +4,7 @@ import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/mongodb';
 import User from '@/models/User';
 import { ObjectId } from 'mongodb';
+import { getMostUsedAgent } from '@/utils/agentStats';
 
 interface AgentStats {
   agentName: string;
@@ -62,21 +63,6 @@ interface TierRanking {
     mostUsedAgent: string;
   }[];
 }
-
-const getMostUsedAgent = (agentStats: AgentStats[]) => {
-  if (!agentStats || agentStats.length === 0) return '미지정';
-
-  const sortedAgents = [...agentStats].sort((a, b) => {
-    if (b.playCount !== a.playCount) {
-      return b.playCount - a.playCount;
-    }
-    const aKD = a.deaths === 0 ? a.kills : a.kills / a.deaths;
-    const bKD = b.deaths === 0 ? b.kills : b.kills / b.deaths;
-    return bKD - aKD;
-  });
-
-  return sortedAgents[0].agentName;
-};
 
 export async function GET(request: Request) {
   try {
