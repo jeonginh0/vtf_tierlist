@@ -272,8 +272,8 @@ export async function GET(request: Request) {
 
       rankings.sort((a, b) => {
         // 주요 요원이 '미지정'이고 K/D가 'Perfect'인 경우 맨 아래로
-        if (a.mostUsedAgent === '미지정' && a.kda === 'Perfect') return 1;
-        if (b.mostUsedAgent === '미지정' && b.kda === 'Perfect') return -1;
+        if (a.mostUsedAgent === '없음' && a.kda === 'Perfect') return 1;
+        if (b.mostUsedAgent === '없음' && b.kda === 'Perfect') return -1;
         
         // 나머지 경우는 기존 정렬 로직 유지
         if (a.kda === 'Perfect' && b.kda !== 'Perfect') return -1;
