@@ -11,21 +11,22 @@ interface AgentStat {
 
 function getMostUsedAgent(agentStats: AgentStat[]): string {
   if (!agentStats || agentStats.length === 0) return '없음';
+
+  let mostUsedAgent = agentStats[0];
   
-  // 플레이 횟수가 가장 많은 요원들을 찾음
-  const maxPlayCount = Math.max(...agentStats.map(stat => stat.playCount));
-  const mostPlayedAgents = agentStats.filter(stat => stat.playCount === maxPlayCount);
-  
-  // 플레이 횟수가 같은 요원이 여러 개인 경우 K/D가 가장 높은 요원을 선택
-  if (mostPlayedAgents.length > 1) {
-    return mostPlayedAgents.reduce((prev, current) => {
-      const prevKD = prev.deaths === 0 ? Infinity : (prev.kills + prev.assists) / prev.deaths;
-      const currentKD = current.deaths === 0 ? Infinity : (current.kills + current.assists) / current.deaths;
-      return currentKD > prevKD ? current : prev;
-    }).agentName;
+  for (const stat of agentStats) {
+    if (stat.playCount > mostUsedAgent.playCount) {
+      mostUsedAgent = stat;
+    } else if (stat.playCount === mostUsedAgent.playCount) {
+      const prevKD = mostUsedAgent.deaths === 0 ? Infinity : (mostUsedAgent.kills + mostUsedAgent.assists) / mostUsedAgent.deaths;
+      const currentKD = stat.deaths === 0 ? Infinity : (stat.kills + stat.assists) / stat.deaths;
+      if (currentKD > prevKD) {
+        mostUsedAgent = stat;
+      }
+    }
   }
-  
-  return mostPlayedAgents[0].agentName;
+
+  return mostUsedAgent.agentName;
 }
 
 export async function GET(request: NextRequest) {
@@ -84,12 +85,12 @@ export async function GET(request: NextRequest) {
     if (error instanceof Error) {
       console.error('에러 상세:', error.message);
       console.error('에러 스택:', error.stack);
+      if (error.name === 'MongoNetworkError') {
+        return NextResponse.json({ error: 'MongoDB 네트워크 오류' }, { status: 500 });
+      }
     }
     return NextResponse.json(
-      { 
-        error: '서버 오류가 발생했습니다.',
-        details: error instanceof Error ? error.message : '알 수 없는 오류'
-      },
+      { error: '서버 오류가 발생했습니다.', details: error instanceof Error ? error.message : '알 수 없는 오류' },
       { status: 500 }
     );
   }

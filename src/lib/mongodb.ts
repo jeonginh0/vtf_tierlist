@@ -10,10 +10,7 @@ const options = {
   serverSelectionTimeoutMS: 10000, // 서버 선택 타임아웃 10초
   socketTimeoutMS: 45000, // 소켓 타임아웃 45초
   connectTimeoutMS: 15000, // 연결 타임아웃 15초
-  maxPoolSize: 50, // 최대 연결 풀 크기
-  minPoolSize: 10, // 최소 연결 풀 크기
   maxIdleTimeMS: 30000, // 유휴 연결 타임아웃 30초
-  waitQueueTimeoutMS: 30000, // 대기 큐 타임아웃 30초
   retryWrites: true, // 쓰기 실패 시 재시도
   retryReads: true, // 읽기 실패 시 재시도
 };
