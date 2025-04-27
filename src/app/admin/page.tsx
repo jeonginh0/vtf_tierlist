@@ -226,8 +226,7 @@ export default function AdminPage() {
     }
   
     const userData = users.find((u) => u._id === selectedUser);
-    const existingAgent = userData?.agentStats.find((a) => a.agentName === agentStats.agentName);
-  
+    const existingAgent = (userData?.agentStats ?? []).find((a) => a.agentName === agentStats.agentName);
     const updatedStats = {
       userId: selectedUser,
       agentName: agentStats.agentName,
