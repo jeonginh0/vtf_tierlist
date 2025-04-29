@@ -16,6 +16,7 @@ interface RankingUser {
   kda: string;
   winRate: string;
   totalGames: number;
+  leaguePoint: number;
 }
 
 export default function Rankings() {
@@ -66,6 +67,7 @@ export default function Rankings() {
                 <thead>
                   <tr>
                     <th>순위</th>
+                    <th>LP</th>
                     <th>닉네임</th>
                     <th>주요 포지션</th>
                     <th>티어</th>
@@ -78,6 +80,7 @@ export default function Rankings() {
                   {rankings.map((user, index) => (
                     <tr key={user._id}>
                       <td>{index + 1}</td>
+                      <td>{user.leaguePoint}</td>
                       <td>{user.nickname}</td>
                       <td>
                         <div className={styles.positionCell}>

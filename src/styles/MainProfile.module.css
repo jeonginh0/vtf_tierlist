@@ -168,8 +168,8 @@
 }
 
 .statCirclePurple {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -206,7 +206,7 @@
 }
 
 .statValuePurple {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #7c3aed;
   text-align: center;
@@ -323,21 +323,24 @@
 
 .statsRow {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 0.5rem;
 }
 
 .statsLabelRow {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 7rem;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
 .statsLabelRow span {
-  font-size: 1rem;
+  width: 80px;
+  text-align: center;
+  font-size: 0.875rem;
   color: #666;
 }
 

@@ -51,7 +51,10 @@ export default function AdminPage() {
     deaths: 0,
     assists: 0,
     isWin: false,
-    isLoss: false
+    isLoss: false,
+    rank: 1,
+    isGameMVP: false,
+    isTeamMVP: false
   });
   const { user, logout } = useAuth();
 
@@ -225,6 +228,11 @@ export default function AdminPage() {
       return;
     }
   
+    if (agentStats.rank < 1 || agentStats.rank > 10) {
+      setError('등수는 1부터 10 사이여야 합니다.');
+      return;
+    }
+  
     const userData = users.find((u) => u._id === selectedUser);
     const existingAgent = (userData?.agentStats ?? []).find((a) => a.agentName === agentStats.agentName);
     const updatedStats = {
@@ -236,8 +244,11 @@ export default function AdminPage() {
       wins: (existingAgent?.wins || 0) + (agentStats.isWin ? 1 : 0),
       losses: (existingAgent?.losses || 0) + (agentStats.isLoss ? 1 : 0),
       playCount: (existingAgent?.playCount || 0) + 1,
-      isWin: agentStats.isWin,  // 승리 여부를 추가
-      isLoss: agentStats.isLoss  // 패배 여부를 추가
+      isWin: agentStats.isWin,
+      isLoss: agentStats.isLoss,
+      rank: agentStats.rank,
+      isGameMVP: agentStats.isGameMVP,
+      isTeamMVP: agentStats.isTeamMVP
     };
 
     try {
@@ -262,7 +273,10 @@ export default function AdminPage() {
         deaths: 0,
         assists: 0,
         isWin: false,
-        isLoss: false
+        isLoss: false,
+        rank: 1,
+        isGameMVP: false,
+        isTeamMVP: false
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : '오류가 발생했습니다.');
@@ -401,6 +415,15 @@ export default function AdminPage() {
                 onChange={(e) => setAgentStats({ ...agentStats, assists: parseInt(e.target.value) })}
                 className={styles.statsInput}
               />
+              <input
+                type="number"
+                placeholder="등수 (1-10)"
+                value={agentStats.rank}
+                onChange={(e) => setAgentStats({ ...agentStats, rank: parseInt(e.target.value) })}
+                min="1"
+                max="10"
+                className={styles.statsInput}
+              />
               <div className={styles.checkboxGroup}>
                 <label>
                   <input
@@ -419,6 +442,24 @@ export default function AdminPage() {
                     disabled={agentStats.isWin}
                   />
                   패배
+                </label>
+              </div>
+              <div className={styles.checkboxGroup}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={agentStats.isGameMVP}
+                    onChange={(e) => setAgentStats({ ...agentStats, isGameMVP: e.target.checked })}
+                  />
+                  게임 MVP
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={agentStats.isTeamMVP}
+                    onChange={(e) => setAgentStats({ ...agentStats, isTeamMVP: e.target.checked })}
+                  />
+                  팀 MVP
                 </label>
               </div>
               <button onClick={handleUpdateAgentStats} className={styles.button}>

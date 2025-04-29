@@ -32,6 +32,7 @@ interface UserStats {
   winRate: string;
   kda: string;
   mostUsedAgent: string;
+  leaguePoint?: number;
 }
 
 export default function ProfilePage() {
@@ -154,10 +155,14 @@ export default function ProfilePage() {
                 <div className={styles.statCirclePurple}>
                   <span className={styles.statValuePurple}>{userStats.winRate}%</span>
                 </div>
+                <div className={styles.statCirclePurple}>
+                  <span className={styles.statValuePurple}>{userStats.leaguePoint || 0}</span>
+                </div>
               </div>
               <div className={styles.statsLabelRow}>
                 <span>총 게임</span>
                 <span>승률</span>
+                <span>LP</span>
               </div>
             </div>
           </div>
